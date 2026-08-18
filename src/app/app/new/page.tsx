@@ -2,13 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { TileGrid, type TileOption } from "@/components/TileGrid";
 
-const DURATIONS = [15, 30, 45, 60];
-const WINDOWS = [
-  { label: "Next 5 days", days: 5 },
-  { label: "Next 7 days", days: 7 },
-  { label: "Next 10 days", days: 10 },
-  { label: "Next 2 weeks", days: 14 },
+const DURATIONS: TileOption<number>[] = [
+  { value: 15, label: "15 min", badge: "Quick" },
+  { value: 30, label: "30 min", badge: "Popular" },
+  { value: 45, label: "45 min" },
+  { value: 60, label: "60 min" },
+];
+
+const WINDOWS: TileOption<number>[] = [
+  { value: 5, label: "Next 5 days" },
+  { value: 7, label: "Next 7 days" },
+  { value: 10, label: "Next 10 days" },
+  { value: 14, label: "Next 2 weeks" },
 ];
 
 export default function NewMeetingPage() {
@@ -47,10 +54,10 @@ export default function NewMeetingPage() {
   }
 
   return (
-    <div style={{ maxWidth: 440 }}>
+    <div style={{ maxWidth: 460 }}>
       <h1 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 1.5rem" }}>Create a WenMeet</h1>
 
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: "1.1rem" }}>
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: "1.4rem" }}>
         <label style={{ display: "grid", gap: "0.4rem", fontSize: "0.85rem", fontWeight: 600 }}>
           What are we meeting about?
           <input
@@ -62,23 +69,15 @@ export default function NewMeetingPage() {
           />
         </label>
 
-        <label style={{ display: "grid", gap: "0.4rem", fontSize: "0.85rem", fontWeight: 600 }}>
-          How long?
-          <select value={duration} onChange={(e) => setDuration(Number(e.target.value))} style={inputStyle}>
-            {DURATIONS.map((d) => (
-              <option key={d} value={d}>{d} min</option>
-            ))}
-          </select>
-        </label>
+        <div style={{ display: "grid", gap: "0.5rem" }}>
+          <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>How long?</span>
+          <TileGrid options={DURATIONS} value={duration} onChange={setDuration} columns={4} />
+        </div>
 
-        <label style={{ display: "grid", gap: "0.4rem", fontSize: "0.85rem", fontWeight: 600 }}>
-          When?
-          <select value={windowDays} onChange={(e) => setWindowDays(Number(e.target.value))} style={inputStyle}>
-            {WINDOWS.map((w) => (
-              <option key={w.days} value={w.days}>{w.label}</option>
-            ))}
-          </select>
-        </label>
+        <div style={{ display: "grid", gap: "0.5rem" }}>
+          <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>When?</span>
+          <TileGrid options={WINDOWS} value={windowDays} onChange={setWindowDays} columns={2} />
+        </div>
 
         {error && <p style={{ color: "var(--blocked-fg)", fontSize: "0.85rem", margin: 0 }}>{error}</p>}
 
