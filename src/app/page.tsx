@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 const DEMO_HREF = "/meetings/demo/availability";
 const DEMO_LINK = "wenmeet.com/m/strategy-7KQ4";
@@ -20,7 +21,7 @@ const AVAIL_CLASS: Record<string, string> = {
   Preferred: "avail-preferred",
 };
 
-const READY_PEOPLE = ["Aman", "Caleb", "Elias"];
+const READY_PEOPLE = ["Aman", "Cindy", "Brad"];
 
 const STEPS = [
   { title: "Show when you’re free", body: "Connect Google or Microsoft, then adjust the times you actually want to offer." },
@@ -131,12 +132,22 @@ export default function HomePage() {
               <a href="#how-it-works" style={styles.navLink}>How it works</a>
               <a href="#for-teams" style={styles.navLink}>For teams</a>
             </div>
-            <button type="button" title="Coming soon" style={styles.signInLink}>
-              Sign in
-            </button>
-            <Link href={DEMO_HREF} className="pill-button pill-button-primary" style={{ padding: "0.5rem 1.2rem", fontSize: "0.85rem" }}>
-              Create a WenMeet &rarr;
-            </Link>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button type="button" style={styles.signInLink}>Sign in</button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button type="button" className="pill-button pill-button-primary" style={{ padding: "0.5rem 1.2rem", fontSize: "0.85rem" }}>
+                  Create a WenMeet &rarr;
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/app/new" className="pill-button pill-button-primary" style={{ padding: "0.5rem 1.2rem", fontSize: "0.85rem" }}>
+                Create a WenMeet &rarr;
+              </Link>
+              <UserButton />
+            </SignedIn>
           </div>
         </div>
       </nav>

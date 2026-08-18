@@ -9,3 +9,12 @@ dist/
 coverage/
 _sync_archive/
 *.tsbuildinfo
+
+# Local Netlify folder
+.netlify
+
+# Agent-skill installer artifacts (local dev tooling, not app code)
+.agents/
+.claude/skills/
+deno.lock
+skills-lock.json

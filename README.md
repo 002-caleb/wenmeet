@@ -1,120 +1,273 @@
 # WenMeet
 
-Intelligent meeting coordination for Conscious Capital Brands. Formerly
-"Nebula Habitats" — renamed per PRD v2. Product ownership: Caleb Pierre
-(CTO). Original prototype: Elias.
+Find a time. Share one link. Get the meeting booked.
 
-This is a from-scratch V1 scaffold built directly against PRD v2's
-resolved sections, so it does **not** carry over the older gaps the PRD
-flagged in a prior build (retry-count locking, Google-only, static-only
-availability with no live-sync seam). Where a full production
-implementation needs infrastructure this scaffold doesn't have
-(a provisioned Supabase project, real Google/Microsoft OAuth apps), that
-piece is stubbed and clearly marked below — everything else is real,
-working code with unit tests.
+WenMeet helps groups coordinate meetings across people, calendars, roles, and timezones — without the usual back-and-forth.
 
-## What's implemented
+The simple version:
 
-- **§4 Participant roles** — `participant_roles` many-to-many
-  (`src/lib/types.ts`, `db/schema.sql`). A meeting can have zero, one, or
-  multiple KDMs; a participant can hold more than one role on the same
-  meeting.
-- **§6 Timezone correction after submission** — `src/lib/timezone/tzCorrection.ts`.
-  A timezone change moves existing submissions to `needs_confirmation`
-  without touching the stored UTC instants. `src/components/TimezoneConverter.tsx`
-  is the "reason across zones without leaving the page" widget.
-- **§7 Scheduling readiness & concurrency**:
-  - Readiness gates only on Required + KDM, excludes waived participants,
-    and treats `needs_confirmation` as blocking, not answered
-    (`src/lib/scheduling/readiness.ts`).
-  - T-24h auto-lock, time-based and not attempt-based
-    (`src/lib/scheduling/lock.ts`).
-  - Versioned snapshot scheduling with automatic recalculation when a
-    Required/KDM participant's confirmed availability changes before
-    lock, soft-capped at 2 retries for organizer-notification purposes
-    only — the cap never blocks the eventual T-24h lock
-    (`src/lib/scheduling/snapshot.ts`).
-- **§12 Rescheduling & waivers**:
-  - Before lock: no overlap → explicit "no valid slot" result, never a
-    guess (`src/lib/scheduling/engine.ts`).
-  - After lock: a Required/KDM decline moves the meeting to
-    `needs_rescheduling` (`src/lib/scheduling/waiver.ts`).
-  - `Waived` is a per-meeting record (`waived_by`, `waived_at`,
-    `waived_reason`) that never touches the participant's global role
-    (`db/schema.sql`, `src/lib/scheduling/waiver.ts`).
-- **§15 Hosting** — Netlify via `@netlify/plugin-nextjs` (`netlify.toml`),
-  plus an independent multi-stage `Dockerfile` with standalone Next.js
-  output so the same image runs on Netlify, a container host, or locally.
-  Data layer is built against the `NebulaStore` interface
-  (`src/lib/store/NebulaStore.ts`) specifically because Netlify Functions
-  are stateless with cold starts — nothing that must persist may live only
-  in the in-memory store.
-
-Run the test suite covering the above (readiness, engine overlap/no-slot,
-T-24h lock, snapshot revalidation + soft-capped retries, waivers,
-timezone correction):
-
+```text
+Create a meeting
+      ↓
+Choose when you're free
+      ↓
+Share one link
+      ↓
+Everyone adds availability
+      ↓
+WenMeet finds the overlap
+      ↓
+Book the meeting
 ```
+
+The scheduling itself is deterministic. No AI is needed to decide whether people are available.
+
+## Where we are
+
+WenMeet already has the core scheduling logic behind the product. It understands:
+
+- required attendees,
+- decision makers,
+- optional attendees,
+- availability,
+- timezone changes,
+- meeting conflicts,
+- rescheduling,
+- participant waivers,
+- and the 24-hour meeting lock.
+
+The core logic is covered by automated tests. The next major work is connecting that foundation to real calendars and finishing the customer experience.
+
+## What works today
+
+### Meeting roles
+
+A meeting can have different kinds of participants:
+
+- **Required** — the meeting cannot be scheduled without them.
+- **Decision maker** — the meeting cannot be scheduled without them.
+- **Optional** — WenMeet tries to include them, but they do not block the meeting.
+
+One person can hold more than one role.
+
+### Scheduling
+
+WenMeet can determine whether a valid meeting time exists. It does not guess. If everyone who must attend cannot meet during the available window, WenMeet returns:
+
+> No time works for everyone yet.
+
+The organizer can then widen the dates or ask people for new availability.
+
+### Timezones
+
+Availability is handled consistently across timezones. If someone's timezone changes after they have already submitted their times, WenMeet asks them to confirm their availability again. The user experience should simply say:
+
+> Still good?
+
+The complicated timezone handling stays behind the screen.
+
+### Changes while scheduling
+
+People can change their availability before the meeting is locked. WenMeet checks that the information it used is still current before accepting a final result. If important availability changed, it recalculates. The user doesn't need to manage this.
+
+### 24-hour lock
+
+Meetings lock 24 hours before they begin. Before then, availability can continue changing. The lock is based on time, not on how many times WenMeet has recalculated the meeting.
+
+### Rescheduling
+
+If someone who is required can no longer attend after the meeting is locked, the meeting moves into:
+
+> Needs rescheduling
+
+WenMeet does not silently remove them. The organizer can find another time, cancel, or explicitly continue without that person.
+
+### Continuing without someone
+
+An organizer can waive someone from one specific meeting. That decision is recorded. It does not change that person's role in future meetings.
+
+## What is being built next
+
+Three pieces matter most now.
+
+### 1. The real product experience
+
+The scheduling engine exists. Now the frontend needs to make it feel simple. The main experience is:
+
+```text
+Create
+  → Choose times
+  → Share
+  → Respond
+  → Book
+```
+
+Important screens include:
+
+- Create a WenMeet
+- Availability grid
+- Share link
+- Participant response
+- Organizer meeting room
+- Best-time selection
+- Booking confirmation
+
+The product should feel simple even though the system underneath is not.
+
+### 2. Google Calendar
+
+WenMeet needs to know when someone is busy without requiring them to manually recreate their calendar. Google Calendar integration will provide:
+
+- sign-in/authorization,
+- free/busy information,
+- live calendar changes,
+- calendar event creation,
+- Google Meet creation.
+
+### 3. Microsoft Outlook
+
+Microsoft receives the same priority as Google. WenMeet will support:
+
+- Outlook / Microsoft 365 calendars,
+- free/busy information,
+- live calendar changes,
+- event creation,
+- Microsoft Teams meetings.
+
+A Google user and a Microsoft user should be able to schedule together without thinking about the difference.
+
+### Live availability
+
+This is an important part of V1. Availability should not become stale just because someone submitted it yesterday. WenMeet's view of someone's availability eventually combines:
+
+```text
+their calendar
+  + times they selected
+  + times they blocked
+  + other WenMeet commitments
+  = when they can actually meet
+```
+
+If another meeting fills a previously free time, WenMeet should know.
+
+## How WenMeet chooses a time
+
+The core scheduling engine does not use an LLM. It uses rules.
+
+First, WenMeet eliminates times that cannot work:
+
+```text
+Required person unavailable   → time cannot be used
+Decision maker unavailable    → time cannot be used
+```
+
+Then it ranks the remaining valid times. Things like optional attendees and preferred hours can make one valid time better than another.
+
+This means the scheduling result is predictable, testable, inexpensive, fast, and explainable. Same information in. Same answer out.
+
+## Technology
+
+WenMeet is a Next.js application designed to run primarily on Netlify. The product is intentionally being kept operationally small.
+
+Main pieces:
+
+```text
+Next.js + TypeScript
+Netlify
+PostgreSQL
+Google Calendar
+Microsoft Outlook
+Google Meet
+Microsoft Teams
+```
+
+The scheduling logic is kept separate from Google, Microsoft, Netlify, and the database. That matters — WenMeet should be able to change infrastructure later without rewriting the heart of the product.
+
+## Current code structure
+
+For developers:
+
+```text
+src/lib/scheduling/   Core scheduling rules
+src/lib/calendar/     Google and Microsoft calendar connections
+src/lib/store/        Persistent data access
+src/lib/timezone/     Timezone handling
+src/app/              WenMeet web application
+tests/                Automated tests
+db/                   Database schema
+```
+
+You do not need to understand these folders to understand the product.
+
+## Running locally
+
+```bash
 npm install
 npm test
+npm run dev
 ```
 
-## What's stubbed (flagged explicitly, not silently missing)
+Then open:
 
-- **Supabase-backed `NebulaStore`** (`src/lib/store/SupabaseStore.ts`) —
-  every method throws until a real Supabase project is provisioned and
-  `db/schema.sql` applied. `DATA_STORE=memory` (default) uses
-  `InMemoryStore` for dev/demo only; it does **not** persist across a
-  Netlify Functions cold start. Every production deploy must set
-  `DATA_STORE=supabase`.
-- **Google + Outlook calendar sync** (`src/lib/calendar/`) — both are P0
-  per PRD §20, and both are wired to the same `CalendarProvider`
-  interface so neither is privileged, but the actual OAuth + live
-  busy/free reads are not implemented. This means the "availability grid
-  as a live source of truth" (PRD §12) — confirmed V1 scope but flagged
-  in the PRD as a materially larger build — is **not** built yet; this
-  scaffold implements statically painted/submitted availability only.
-  `CalendarProvider.getBusyBlocks` is the seam where live sync plugs in
-  without needing to touch the scheduling engine.
-- **UI** — the API routes and domain logic are complete and tested; the
-  participant-facing "paint a grid" interaction and the organizer
-  dashboard are not built out beyond a minimal availability page with the
-  timezone-converter widget (`src/app/meetings/[id]/availability/page.tsx`).
-  Routes exist under `src/app/api/meetings/**` to drive everything
-  programmatically in the meantime.
-
-## Open questions this scaffold does not resolve
-
-Per the PRD's own "Open Questions — Not Yet Resolved" section:
-
-- KDM proxy assignment + live in-meeting voting — not built; needs a
-  scope decision (V1 vs. P1/P2) before it's worth designing for.
-- Shared calendar visibility between CEO/CTO — not built; needs a scope
-  decision.
-- Naming — the PRD's title block treats "WenMeet" as final and this
-  scaffold is named accordingly, but flag for the team that the PRD's own
-  Open Questions section listed this as unconfirmed. If it changes, the
-  main rename surface is: `package.json` name/description, this README,
-  `src/app/layout.tsx` metadata, and doc comments referencing "WenMeet".
-
-## Architecture at a glance
-
-```
-src/lib/types.ts              domain model (Participant, Meeting, Availability, Waiver, ...)
-src/lib/store/                NebulaStore interface + InMemoryStore + SupabaseStore (stub)
-src/lib/scheduling/           readiness, overlap, engine, snapshot/lock, waiver
-src/lib/timezone/             timezone-change → needs_confirmation, tz display conversion
-src/lib/calendar/             CalendarProvider seam (Google/Outlook stubs)
-src/app/api/**                REST-ish routes wiring the above together
-src/app/**/page.tsx           minimal UI
-db/schema.sql                 Supabase schema matching src/lib/types.ts
-tests/**                      vitest coverage of every resolved PRD section above
+```text
+http://localhost:3000
 ```
 
-## Deploying
+## What is real vs. unfinished
 
-- **Netlify**: connect the repo, `netlify.toml` handles the rest. Set
-  `DATA_STORE=supabase` plus the Supabase and OAuth env vars from
-  `.env.example` in the Netlify site's environment settings before going
-  beyond internal demo use.
-- **Docker**: `docker build -t wenmeet . && docker run -p 3000:3000 --env-file .env wenmeet`
+**Working**
+
+- meeting roles
+- required/decision-maker rules
+- deterministic overlap calculation
+- no-overlap detection
+- timezone correction
+- scheduling revalidation
+- 24-hour locking rules
+- rescheduling logic
+- per-meeting waivers
+- automated tests
+
+**Still being completed**
+
+- polished customer-facing UI
+- Google OAuth
+- live Google Calendar availability
+- Google Meet creation
+- Microsoft OAuth
+- live Outlook availability
+- Microsoft Teams creation
+- production database configuration
+- live calendar change notifications
+
+Nothing unfinished should be disguised as finished.
+
+## Product decisions still open
+
+These are not required to make the core scheduling product useful.
+
+- **Decision-maker proxies** — should a decision maker be able to nominate another person to act for them? Possible later feature.
+- **Live meeting voting** — useful for the broader meeting-intelligence vision, but not necessary for the scheduling wedge.
+- **Shared team calendar** — potential future view for organizations using WenMeet frequently.
+
+The first priority remains making the basic scheduling experience excellent.
+
+## Product rule
+
+WenMeet can be complicated underneath. It should never feel complicated to use.
+
+The customer should experience:
+
+```text
+When can you meet?
+        ↓
+Send this link.
+        ↓
+Everyone's ready.
+        ↓
+Thursday at 10 works.
+        ↓
+Booked.
+```
+
+Everything else exists to make those five moments reliable.
