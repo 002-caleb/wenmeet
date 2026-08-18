@@ -188,13 +188,13 @@ The scheduling logic is kept separate from Google, Microsoft, Netlify, and the d
 For developers:
 
 ```text
-src/lib/scheduling/   Core scheduling rules
-src/lib/calendar/     Google and Microsoft calendar connections
-src/lib/store/        Persistent data access
-src/lib/timezone/     Timezone handling
-src/app/              WenMeet web application
-tests/                Automated tests
-db/                   Database schema
+src/lib/scheduling/           Core scheduling rules
+src/lib/calendar/             Google and Microsoft calendar connections
+src/lib/store/                Persistent data access
+src/lib/timezone/             Timezone handling
+src/app/                      WenMeet web application
+tests/                        Automated tests
+netlify/database/migrations/  Database schema
 ```
 
 You do not need to understand these folders to understand the product.
@@ -227,17 +227,16 @@ http://localhost:3000
 - rescheduling logic
 - per-meeting waivers
 - automated tests
+- Google Calendar connection (OAuth + free/busy)
+- Microsoft Outlook connection (OAuth + free/busy)
+- production data persistence (Netlify Database)
 
 **Still being completed**
 
 - polished customer-facing UI
-- Google OAuth
-- live Google Calendar availability
+- the availability grid actually showing connected-calendar busy times
 - Google Meet creation
-- Microsoft OAuth
-- live Outlook availability
 - Microsoft Teams creation
-- production database configuration
 - live calendar change notifications
 
 Nothing unfinished should be disguised as finished.

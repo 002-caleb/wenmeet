@@ -1,9 +1,5 @@
--- WenMeet — Supabase schema.
--- Applied whenever DATA_STORE=supabase (required for every production
--- deployment; the in-memory NebulaStore does not persist across
--- Netlify Functions cold starts — see README and PRD §15).
-
-create extension if not exists "pgcrypto";
+-- WenMeet — initial schema, applied automatically by Netlify Database on deploy.
+-- gen_random_uuid() is core Postgres (13+) — no pgcrypto extension needed.
 
 create table if not exists participants (
   id uuid primary key default gen_random_uuid(),
@@ -30,9 +26,9 @@ create table if not exists meetings (
   created_at timestamptz not null default now()
 );
 
--- §4: participant_roles is many-to-many. A meeting can have zero, one,
--- or multiple KDMs; a participant can hold more than one role on the
--- same meeting (e.g. required + kdm).
+-- participant_roles is many-to-many. A meeting can have zero, one, or
+-- multiple KDMs; a participant can hold more than one role on the same
+-- meeting (e.g. required + kdm).
 create table if not exists participant_roles (
   participant_id uuid not null references participants(id),
   meeting_id uuid not null references meetings(id),
@@ -51,14 +47,14 @@ create table if not exists availability (
   submitted_timezone text not null,
   updated_at timestamptz not null default now(),
   -- Monotonic counter incremented on every upsert. Snapshot staleness
-  -- checks (§7) compare this, not updated_at — two upserts landing in
-  -- the same instant would otherwise be indistinguishable.
+  -- checks compare this, not updated_at — two upserts landing in the
+  -- same instant would otherwise be indistinguishable.
   version int not null default 1,
   unique (meeting_id, participant_id)
 );
 
--- §12: a participant waived from one specific meeting only. Their
--- global role (participant_roles) is untouched by this table.
+-- A participant waived from one specific meeting only. Their global
+-- role (participant_roles) is untouched by this table.
 create table if not exists waivers (
   meeting_id uuid not null references meetings(id),
   participant_id uuid not null references participants(id),
@@ -68,9 +64,9 @@ create table if not exists waivers (
   primary key (meeting_id, participant_id)
 );
 
--- §7: frozen snapshot per scheduling run, retained for organizer
--- visibility of automatic recalculation (soft-capped at 2 retries; the
--- cap is visibility-only and never blocks the T-24h auto-lock).
+-- Frozen snapshot per scheduling run, retained for organizer visibility
+-- of automatic recalculation (soft-capped at 2 retries; the cap is
+-- visibility-only and never blocks the T-24h auto-lock).
 create table if not exists scheduling_snapshots (
   id uuid primary key default gen_random_uuid(),
   meeting_id uuid not null references meetings(id),
@@ -91,9 +87,9 @@ create index if not exists idx_participant_roles_meeting on participant_roles(me
 create index if not exists idx_availability_meeting on availability(meeting_id);
 create index if not exists idx_snapshots_meeting on scheduling_snapshots(meeting_id);
 
--- Live calendar sync (README "Google Calendar" / "Microsoft Outlook").
--- Tokens live here, not on participants, so CalendarProvider stays the
--- only thing that ever reads them.
+-- Live calendar sync (Google Calendar / Microsoft Outlook). Tokens live
+-- here, not on participants, so CalendarProvider stays the only thing
+-- that ever reads them.
 create table if not exists calendar_connections (
   participant_id uuid not null references participants(id),
   provider text not null check (provider in ('google', 'microsoft')),

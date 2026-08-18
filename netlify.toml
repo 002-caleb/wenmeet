@@ -6,10 +6,22 @@
   package = "@netlify/plugin-nextjs"
 
 [build.environment]
-  # Production deploys MUST override this to "supabase" — see README §Data layer.
-  # The in-memory store does not persist across Netlify Functions cold starts.
+  # Default (local `next dev` without the Netlify CLI, or any unmatched
+  # context) — the in-memory store, dev/demo only, does not persist
+  # across a Netlify Functions cold start.
   DATA_STORE = "memory"
 
-# WenMeet is hosted on Netlify (see PRD §15). The app is also Dockerized
-# independently (see Dockerfile) so the same image can run on Netlify,
-# a container host, or locally without a rebuild.
+[context.production.environment]
+  # Netlify Database (managed Postgres) — schema applied automatically
+  # from netlify/database/migrations/ on deploy. See README.
+  DATA_STORE = "netlify"
+
+[context.deploy-preview.environment]
+  # Each deploy preview gets its own isolated database branch, seeded
+  # from production — real persistence, safe to test against.
+  DATA_STORE = "netlify"
+
+# WenMeet is hosted on Netlify. The app is also Dockerized independently
+# (see Dockerfile) so the same image can run on Netlify, a container
+# host, or locally without a rebuild — DATA_STORE must be set to
+# "memory" there since Netlify Database isn't reachable outside Netlify.

@@ -10,12 +10,13 @@ import type {
 
 /**
  * Data-access seam for the whole app. Netlify Functions are stateless
- * with cold starts (PRD §15), so nothing that must survive a cold start
- * may live only in process memory — it has to go through this interface.
+ * with cold starts, so nothing that must survive a cold start may live
+ * only in process memory — it has to go through this interface.
  *
  * `InMemoryStore` implements this for local dev/demo only.
- * `SupabaseStore` is the production-shaped implementation; production
- * deployments must run with DATA_STORE=supabase and db/schema.sql applied.
+ * `NetlifyDatabaseStore` is the production implementation, backed by
+ * Netlify Database (managed Postgres) — schema lives in
+ * netlify/database/migrations/, applied automatically on deploy.
  */
 export interface NebulaStore {
   // Participants
