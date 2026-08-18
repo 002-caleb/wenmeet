@@ -14,6 +14,8 @@ export interface Participant {
   email: string;
   /** IANA timezone, e.g. "America/Los_Angeles". */
   timezone: string;
+  /** Bridges an authenticated Clerk user to their Participant record. Unset for participants who only ever respond via a shared link. */
+  clerkUserId?: string;
 }
 
 /**

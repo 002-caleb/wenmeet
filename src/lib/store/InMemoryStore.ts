@@ -37,6 +37,13 @@ export class InMemoryStore implements NebulaStore {
     return this.participants.get(id) ?? null;
   }
 
+  async getParticipantByClerkUserId(clerkUserId: string): Promise<Participant | null> {
+    for (const p of this.participants.values()) {
+      if (p.clerkUserId === clerkUserId) return p;
+    }
+    return null;
+  }
+
   async updateParticipantTimezone(id: string, timezone: string): Promise<Participant> {
     const existing = this.participants.get(id);
     if (!existing) throw new Error(`Participant ${id} not found`);
@@ -61,6 +68,12 @@ export class InMemoryStore implements NebulaStore {
     const updated = { ...existing, ...patch };
     this.meetings.set(id, updated);
     return updated;
+  }
+
+  async getMeetingsByOrganizer(organizerId: string): Promise<Meeting[]> {
+    return [...this.meetings.values()]
+      .filter((m) => m.organizerId === organizerId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
   async assignRole(role: ParticipantRole): Promise<void> {

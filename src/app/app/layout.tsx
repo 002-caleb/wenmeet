@@ -1,14 +1,20 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { UserButton } from "@clerk/nextjs";
+import { getOrCreateCurrentParticipant } from "@/lib/auth/currentParticipant";
 
 /**
  * Application shell (docs/AUTHENTICATED_APP_SHELL_ROUTING.md §7, §13).
  * Deliberately separate from the marketing shell in src/app/page.tsx —
  * no Product / How it works / For teams here, and the logo stays inside
  * the app (§8: clicking it must never eject a user into marketing).
+ *
+ * Runs the Clerk <-> Participant bridge on every /app visit — middleware
+ * already guarantees a session exists here, so this is a plain find-or-create.
  */
-export default function AppLayout({ children }: { children: ReactNode }) {
+export default async function AppLayout({ children }: { children: ReactNode }) {
+  await getOrCreateCurrentParticipant();
+
   return (
     <div style={{ minHeight: "100vh" }}>
       <nav style={styles.nav}>

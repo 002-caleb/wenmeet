@@ -20,12 +20,14 @@ export interface NebulaStore {
   // Participants
   createParticipant(p: Omit<Participant, "id">): Promise<Participant>;
   getParticipant(id: string): Promise<Participant | null>;
+  getParticipantByClerkUserId(clerkUserId: string): Promise<Participant | null>;
   updateParticipantTimezone(id: string, timezone: string): Promise<Participant>;
 
   // Meetings
   createMeeting(m: Omit<Meeting, "id" | "createdAt">): Promise<Meeting>;
   getMeeting(id: string): Promise<Meeting | null>;
   updateMeeting(id: string, patch: Partial<Meeting>): Promise<Meeting>;
+  getMeetingsByOrganizer(organizerId: string): Promise<Meeting[]>;
 
   // Roles (participant_roles, many-to-many)
   assignRole(role: ParticipantRole): Promise<void>;

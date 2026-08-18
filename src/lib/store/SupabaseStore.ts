@@ -41,6 +41,9 @@ export class SupabaseStore implements NebulaStore {
   async getParticipant(_id: string): Promise<Participant | null> {
     this.notImplemented("getParticipant");
   }
+  async getParticipantByClerkUserId(_clerkUserId: string): Promise<Participant | null> {
+    this.notImplemented("getParticipantByClerkUserId");
+  }
   async updateParticipantTimezone(_id: string, _timezone: string): Promise<Participant> {
     this.notImplemented("updateParticipantTimezone");
   }
@@ -52,6 +55,9 @@ export class SupabaseStore implements NebulaStore {
   }
   async updateMeeting(_id: string, _patch: Partial<Meeting>): Promise<Meeting> {
     this.notImplemented("updateMeeting");
+  }
+  async getMeetingsByOrganizer(_organizerId: string): Promise<Meeting[]> {
+    this.notImplemented("getMeetingsByOrganizer");
   }
   async assignRole(_role: ParticipantRole): Promise<void> {
     this.notImplemented("assignRole");

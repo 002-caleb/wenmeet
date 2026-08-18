@@ -9,7 +9,10 @@ create table if not exists participants (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   email text not null unique,
-  timezone text not null
+  timezone text not null,
+  -- Bridges an authenticated Clerk user to their Participant record.
+  -- Null for participants who only ever respond via a shared link.
+  clerk_user_id text unique
 );
 
 create table if not exists meetings (
