@@ -8,3 +8,4 @@ node_modules/
 dist/
 coverage/
 _sync_archive/
+*.tsbuildinfo
