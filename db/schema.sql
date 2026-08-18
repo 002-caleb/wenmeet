@@ -100,5 +100,8 @@ create table if not exists calendar_connections (
   access_token text not null,
   refresh_token text not null,
   expires_at timestamptz not null,
+  -- The connected account's own address — shown in the UI so "is this
+  -- my calendar?" has a visible answer.
+  account_email text not null,
   primary key (participant_id, provider)
 );

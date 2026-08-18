@@ -4,9 +4,10 @@ import type { TimeSlot } from "../types";
  * Seam for live calendar busy/free data — the availability grid should be
  * a live source of truth, not a static submission.
  *
- * Google is real (src/lib/calendar/providers.ts, backed by the OAuth flow
- * under src/app/api/auth/google/). Microsoft is still a stub — same
- * priority as Google (see README), not yet built.
+ * Both Google and Microsoft are real now (src/lib/calendar/providers.ts,
+ * backed by the OAuth flows under src/app/api/auth/{google,microsoft}/).
+ * `NotImplementedCalendarProvider` below is kept as the seam for adding a
+ * future provider without touching the scheduling engine.
  */
 export interface CalendarProvider {
   readonly kind: "google" | "microsoft";

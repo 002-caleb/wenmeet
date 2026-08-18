@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { UserButton } from "@clerk/nextjs";
 import { getOrCreateCurrentParticipant } from "@/lib/auth/currentParticipant";
+import { AppNavLinks } from "@/components/AppNavLinks";
 
 /**
  * Application shell (docs/AUTHENTICATED_APP_SHELL_ROUTING.md §7, §13).
@@ -16,15 +17,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   await getOrCreateCurrentParticipant();
 
   return (
-    <div style={{ minHeight: "100vh" }}>
+    <div style={{ minHeight: "100dvh" }}>
       <nav style={styles.nav}>
         <div style={styles.navInner}>
           <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
             <Link href="/app" style={styles.logo}>WenMeet</Link>
-            <div style={{ display: "flex", gap: "1.25rem" }}>
-              <Link href="/app/meetings" style={styles.navLink}>Meetings</Link>
-              <Link href="/app/calendars" style={styles.navLink}>Calendars</Link>
-            </div>
+            <AppNavLinks />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <Link href="/app/new" className="pill-button pill-button-primary" style={{ padding: "0.5rem 1.1rem", fontSize: "0.85rem" }}>
@@ -34,7 +32,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </nav>
-      <main style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1.5rem" }}>{children}</main>
+      <main id="main" style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1.5rem" }}>{children}</main>
     </div>
   );
 }
@@ -53,5 +51,4 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "space-between",
   },
   logo: { fontWeight: 800, fontSize: "1rem", color: "var(--text)", textDecoration: "none" },
-  navLink: { fontSize: "0.88rem", fontWeight: 600, color: "var(--text-muted)", textDecoration: "none" },
 };

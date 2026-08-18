@@ -122,7 +122,7 @@ export default function HomePage() {
   };
 
   return (
-    <div ref={rootRef}>
+    <div ref={rootRef} id="main">
       <nav data-hero-nav style={styles.nav}>
         <div className="container" style={styles.navInner}>
           <span style={styles.logo}>WenMeet</span>
@@ -268,7 +268,7 @@ export default function HomePage() {
             <div className="link-copy">
               <code>{DEMO_LINK}</code>
               <button type="button" onClick={copyLink} className="pill-button pill-button-primary" style={{ padding: "0.45rem 1.1rem", fontSize: "0.85rem" }}>
-                {copied ? "Copied!" : "Copy link"}
+                {copied ? "Copied" : "Copy link"}
               </button>
             </div>
           </div>
@@ -283,7 +283,7 @@ export default function HomePage() {
 
       <section id="how-it-works" className="container" style={{ marginTop: "5.5rem" }}>
         <div data-reveal style={{ marginBottom: "1.75rem", textAlign: "center" }}>
-          <h2 style={styles.h2}>How It Works</h2>
+          <h2 style={styles.h2}>How it works</h2>
         </div>
         <div data-reveal-stagger style={{ display: "grid", gap: "1.4rem", maxWidth: 640, margin: "0 auto" }}>
           {STEPS.map((s, i) => (

@@ -3,8 +3,14 @@ import { getStore } from "@/lib/store";
 
 const ERROR_COPY: Record<string, string> = {
   google_declined: "You declined the Google Calendar connection.",
+  microsoft_declined: "You declined the Microsoft Outlook connection.",
   invalid_state: "That connection attempt expired or looked tampered with — try again.",
-  exchange_failed: "Google Calendar didn't confirm the connection — try again.",
+  exchange_failed: "That calendar didn't confirm the connection — try again.",
+};
+
+const CONNECTED_COPY: Record<string, string> = {
+  google: "Google Calendar connected.",
+  microsoft: "Microsoft Outlook connected.",
 };
 
 export default async function CalendarsPage({
@@ -14,17 +20,19 @@ export default async function CalendarsPage({
 }) {
   const params = await searchParams;
   const participant = await getOrCreateCurrentParticipant();
-  const googleConnection = participant
-    ? await getStore().getCalendarConnection(participant.id, "google")
-    : null;
+  const store = getStore();
+  const googleConnection = participant ? await store.getCalendarConnection(participant.id, "google") : null;
+  const microsoftConnection = participant ? await store.getCalendarConnection(participant.id, "microsoft") : null;
 
   return (
     <div>
       <h1 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 1rem" }}>Calendars</h1>
 
-      {params.connected === "google" && (
+      {params.connected && CONNECTED_COPY[params.connected] && (
         <div className="card" style={{ padding: "0.85rem 1.1rem", marginBottom: "1rem", background: "var(--ready-bg)", borderColor: "var(--ready-fg)" }}>
-          <span style={{ color: "var(--ready-fg)", fontWeight: 600, fontSize: "0.9rem" }}>Google Calendar connected.</span>
+          <span style={{ color: "var(--ready-fg)", fontWeight: 600, fontSize: "0.9rem" }}>
+            {CONNECTED_COPY[params.connected]}
+          </span>
         </div>
       )}
       {params.error && (
@@ -54,14 +62,15 @@ export default async function CalendarsPage({
             <div style={{ fontWeight: 700 }}>Microsoft Outlook</div>
             <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>Use your existing work calendar.</div>
           </div>
-          <button type="button" className="pill-button pill-button-secondary" disabled style={{ opacity: 0.6, cursor: "not-allowed" }}>
-            Connect
-          </button>
+          {microsoftConnection ? (
+            <span className="badge badge-ready">Connected &#10003;</span>
+          ) : (
+            <a href="/api/auth/microsoft/authorize" className="pill-button pill-button-secondary" style={{ padding: "0.5rem 1.1rem", fontSize: "0.85rem" }}>
+              Connect
+            </a>
+          )}
         </div>
       </div>
-      <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: "1rem" }}>
-        Microsoft Outlook sync isn&rsquo;t wired up yet — see README.
-      </p>
     </div>
   );
 }

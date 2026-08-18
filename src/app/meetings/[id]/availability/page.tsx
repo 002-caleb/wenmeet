@@ -153,11 +153,17 @@ export default function AvailabilityPage() {
 
   if (step === "done") {
     return (
-      <main style={{ maxWidth: 480, textAlign: "center" }}>
+      <main id="main" style={{ maxWidth: 480, textAlign: "center" }}>
         <div style={{ marginTop: "3rem" }}>
           <h1 style={{ fontSize: "1.7rem", fontWeight: 800, margin: "0 0 0.6rem" }}>You&rsquo;re all set.</h1>
           <p style={{ color: "var(--text-muted)" }}>Your availability is saved.</p>
-          <button type="button" className="pill-button pill-button-secondary" style={{ marginTop: "1.75rem" }}>
+          <button
+            type="button"
+            className="pill-button pill-button-secondary"
+            disabled
+            title="Not available yet"
+            style={{ marginTop: "1.75rem", opacity: 0.5, cursor: "not-allowed" }}
+          >
             Add WenMeet to your calendar
           </button>
           <div style={{ marginTop: "1rem" }}>
@@ -169,7 +175,7 @@ export default function AvailabilityPage() {
   }
 
   return (
-    <main style={{ maxWidth: 640 }}>
+    <main id="main" style={{ maxWidth: 640 }}>
       <Link href="/" style={{ fontSize: "0.85rem", color: "var(--text-muted)", textDecoration: "none" }}>
         &larr; WenMeet
       </Link>

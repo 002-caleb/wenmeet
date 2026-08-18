@@ -6,8 +6,13 @@
 const AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const FREEBUSY_URL = "https://www.googleapis.com/calendar/v3/freeBusy";
+const USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
 
-const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
+const SCOPES = [
+  "https://www.googleapis.com/auth/calendar.readonly",
+  // Just enough to show "connected as x@gmail.com" in the UI — no profile data beyond the address.
+  "https://www.googleapis.com/auth/userinfo.email",
+];
 
 function requireEnv(name: string): string {
   const value = process.env[name];
@@ -105,4 +110,13 @@ export async function queryGoogleFreeBusy(
     calendars: Record<string, { busy: { start: string; end: string }[] }>;
   };
   return (body.calendars.primary?.busy ?? []).map((b) => ({ startUtc: b.start, endUtc: b.end }));
+}
+
+export async function fetchGoogleAccountEmail(accessToken: string): Promise<string> {
+  const res = await fetch(USERINFO_URL, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (!res.ok) {
+    throw new Error(`Google userinfo failed: ${res.status} ${await res.text()}`);
+  }
+  const body = (await res.json()) as { email: string };
+  return body.email;
 }

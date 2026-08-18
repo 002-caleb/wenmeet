@@ -75,6 +75,8 @@ export interface CalendarConnection {
   refreshToken: string;
   /** ISO-8601 UTC instant the access token expires. */
   expiresAt: string;
+  /** The connected account's own address — shown in the UI so "is this my calendar?" has a visible answer. */
+  accountEmail: string;
 }
 
 /**
