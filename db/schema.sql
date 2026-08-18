@@ -90,3 +90,15 @@ alter table meetings
 create index if not exists idx_participant_roles_meeting on participant_roles(meeting_id);
 create index if not exists idx_availability_meeting on availability(meeting_id);
 create index if not exists idx_snapshots_meeting on scheduling_snapshots(meeting_id);
+
+-- Live calendar sync (README "Google Calendar" / "Microsoft Outlook").
+-- Tokens live here, not on participants, so CalendarProvider stays the
+-- only thing that ever reads them.
+create table if not exists calendar_connections (
+  participant_id uuid not null references participants(id),
+  provider text not null check (provider in ('google', 'microsoft')),
+  access_token text not null,
+  refresh_token text not null,
+  expires_at timestamptz not null,
+  primary key (participant_id, provider)
+);

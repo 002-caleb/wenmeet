@@ -1,5 +1,6 @@
 import type {
   Availability,
+  CalendarConnection,
   Meeting,
   Participant,
   ParticipantRole,
@@ -92,5 +93,14 @@ export class SupabaseStore implements NebulaStore {
   }
   async getSnapshot(_id: string): Promise<SchedulingSnapshot | null> {
     this.notImplemented("getSnapshot");
+  }
+  async saveCalendarConnection(_c: CalendarConnection): Promise<void> {
+    this.notImplemented("saveCalendarConnection");
+  }
+  async getCalendarConnection(
+    _participantId: string,
+    _provider: CalendarConnection["provider"],
+  ): Promise<CalendarConnection | null> {
+    this.notImplemented("getCalendarConnection");
   }
 }

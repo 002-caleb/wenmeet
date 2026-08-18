@@ -1,5 +1,6 @@
 import type {
   Availability,
+  CalendarConnection,
   Meeting,
   Participant,
   ParticipantRole,
@@ -48,4 +49,11 @@ export interface NebulaStore {
   createSnapshot(s: Omit<SchedulingSnapshot, "id" | "createdAt">): Promise<SchedulingSnapshot>;
   updateSnapshot(id: string, patch: Partial<SchedulingSnapshot>): Promise<SchedulingSnapshot>;
   getSnapshot(id: string): Promise<SchedulingSnapshot | null>;
+
+  // Calendar connections
+  saveCalendarConnection(c: CalendarConnection): Promise<void>;
+  getCalendarConnection(
+    participantId: string,
+    provider: CalendarConnection["provider"],
+  ): Promise<CalendarConnection | null>;
 }

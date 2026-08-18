@@ -1,16 +1,12 @@
 import type { TimeSlot } from "../types";
 
 /**
- * Seam for live calendar busy/free data (PRD §12 — "the availability grid
- * is a live source of truth, not a static submission", confirmed V1 scope).
+ * Seam for live calendar busy/free data — the availability grid should be
+ * a live source of truth, not a static submission.
  *
- * This scaffold implements the interface and where it plugs into the
- * scheduling engine, but the actual OAuth + calendar-read wiring for
- * Google and Microsoft is stubbed — same status as the original PRD's
- * "Google OAuth: stubbed" note. Build sequencing still needs a pass to
- * make CalendarProvider.getBusyBlocks return real data; until then the
- * app runs on statically painted availability only, matching the
- * "Not yet reflected in the build" flag in the PRD.
+ * Google is real (src/lib/calendar/providers.ts, backed by the OAuth flow
+ * under src/app/api/auth/google/). Microsoft is still a stub — same
+ * priority as Google (see README), not yet built.
  */
 export interface CalendarProvider {
   readonly kind: "google" | "microsoft";

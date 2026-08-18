@@ -1,5 +1,6 @@
 import type {
   Availability,
+  CalendarConnection,
   Meeting,
   Participant,
   ParticipantRole,
@@ -26,6 +27,7 @@ export class InMemoryStore implements NebulaStore {
   private availability = new Map<string, Availability>(); // key: meetingId:participantId
   private waivers: Waiver[] = [];
   private snapshots = new Map<string, SchedulingSnapshot>();
+  private calendarConnections = new Map<string, CalendarConnection>(); // key: participantId:provider
 
   async createParticipant(p: Omit<Participant, "id">): Promise<Participant> {
     const participant: Participant = { ...p, id: nextId("participant") };
@@ -149,6 +151,17 @@ export class InMemoryStore implements NebulaStore {
     return this.snapshots.get(id) ?? null;
   }
 
+  async saveCalendarConnection(c: CalendarConnection): Promise<void> {
+    this.calendarConnections.set(`${c.participantId}:${c.provider}`, c);
+  }
+
+  async getCalendarConnection(
+    participantId: string,
+    provider: CalendarConnection["provider"],
+  ): Promise<CalendarConnection | null> {
+    return this.calendarConnections.get(`${participantId}:${provider}`) ?? null;
+  }
+
   /** Test/demo helper only — not part of the NebulaStore interface. */
   reset(): void {
     this.participants.clear();
@@ -157,5 +170,6 @@ export class InMemoryStore implements NebulaStore {
     this.availability.clear();
     this.waivers = [];
     this.snapshots.clear();
+    this.calendarConnections.clear();
   }
 }

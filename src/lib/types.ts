@@ -64,6 +64,20 @@ export interface Availability {
 }
 
 /**
+ * A participant's connected external calendar. `getBusyBlocks` (see
+ * CalendarProvider) reads through this — tokens live here, not in
+ * Participant, so the domain model stays provider-agnostic.
+ */
+export interface CalendarConnection {
+  participantId: string;
+  provider: "google" | "microsoft";
+  accessToken: string;
+  refreshToken: string;
+  /** ISO-8601 UTC instant the access token expires. */
+  expiresAt: string;
+}
+
+/**
  * A participant waived from one specific meeting. Their global role is
  * untouched — this record only affects `meetingId`.
  */
