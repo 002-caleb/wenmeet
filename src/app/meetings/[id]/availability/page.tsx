@@ -8,7 +8,7 @@ import { DateRangeNavigator } from "@/components/DateRangeNavigator";
 import { CalendarStatus } from "@/components/CalendarStatus";
 import { TimezoneControl } from "@/components/TimezoneControl";
 import { AvailabilityFooter } from "@/components/AvailabilityFooter";
-import { detectBrowserTimezone } from "@/lib/timezone/tzConvert";
+import { detectBrowserTimezone, humanTimezoneLabel } from "@/lib/timezone/tzConvert";
 import { addDays, formatDateKey, formatWeekdayShort, isSameDay, parseHourLabel, startOfDay } from "@/lib/copy/dateLabels";
 import { buildMeetingContextViewModel } from "@/lib/copy/meetingContext";
 import { buildDateRangeNavigationViewModel } from "@/lib/copy/dateRangeNav";
@@ -16,14 +16,6 @@ import { buildDateRangeNavigationViewModel } from "@/lib/copy/dateRangeNav";
 const TIMES = ["9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM"];
 const VISIBLE_DAYS = 4;
 const WINDOW_LENGTH_DAYS = 12; // the organizer's configured scheduling window
-
-function humanTimezoneLabel(tz: string): string {
-  const city = tz.split("/").pop()?.replace(/_/g, " ") ?? tz;
-  const abbrev = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "short" })
-    .formatToParts(new Date())
-    .find((p) => p.type === "timeZoneName")?.value;
-  return abbrev ? `${city} · ${abbrev}` : city;
-}
 
 /**
  * Participant availability screen

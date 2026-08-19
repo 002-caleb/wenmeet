@@ -1,0 +1,663 @@
+<title>Netlify Footprint</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ink: #161a1d;
+    --paper: #f6f7f5;
+    --surface: #ffffff;
+    --line: #d9dedb;
+    --line-soft: #e7eae7;
+    --muted: #5c6660;
+    --muted-soft: #8b9490;
+
+    --wenmeet: #3454ff;
+    --wenmeet-soft: #eef1ff;
+    --wenmeet-ink: #1c2e8a;
+
+    --netlify: #0e9c86;
+    --netlify-soft: #e6f5f1;
+    --netlify-ink: #076a5a;
+    --netlify-line: #b6e2d8;
+
+    --external: #8a7a5c;
+    --external-soft: #f4efe3;
+    --external-line: #ddd0b2;
+
+    --shadow: 0 1px 2px rgba(20, 24, 22, 0.04);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #eef0ee;
+      --paper: #14171a;
+      --surface: #1b1f22;
+      --line: #2c3236;
+      --line-soft: #23282b;
+      --muted: #a4aca7;
+      --muted-soft: #737d78;
+
+      --wenmeet: #7c93ff;
+      --wenmeet-soft: #1a2140;
+      --wenmeet-ink: #c3ccff;
+
+      --netlify: #3fcdb3;
+      --netlify-soft: #10312b;
+      --netlify-ink: #a9ecdf;
+      --netlify-line: #1f5449;
+
+      --external: #cbb98d;
+      --external-soft: #2c2618;
+      --external-line: #4a4127;
+
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ink: #eef0ee;
+    --paper: #14171a;
+    --surface: #1b1f22;
+    --line: #2c3236;
+    --line-soft: #23282b;
+    --muted: #a4aca7;
+    --muted-soft: #737d78;
+
+    --wenmeet: #7c93ff;
+    --wenmeet-soft: #1a2140;
+    --wenmeet-ink: #c3ccff;
+
+    --netlify: #3fcdb3;
+    --netlify-soft: #10312b;
+    --netlify-ink: #a9ecdf;
+    --netlify-line: #1f5449;
+
+    --external: #cbb98d;
+    --external-soft: #2c2618;
+    --external-line: #4a4127;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3.2rem 1.75rem 5rem;
+  }
+
+  header.top {
+    margin-bottom: 2.6rem;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-soft);
+    margin: 0 0 0.85rem;
+  }
+
+  h1 {
+    font-family: "Sora", ui-sans-serif, sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.7rem, 3.4vw, 2.35rem);
+    letter-spacing: -0.015em;
+    margin: 0 0 0.65rem;
+    text-wrap: balance;
+  }
+
+  .lede {
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0;
+    font-size: 0.98rem;
+  }
+
+  .lede code, .inline-code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.86em;
+    background: var(--line-soft);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+
+  /* ---- flow scaffolding ---- */
+
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .connector {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-left: 1.6rem;
+    margin: 0.15rem 0;
+    color: var(--muted-soft);
+  }
+
+  .connector .line {
+    width: 1px;
+    height: 22px;
+    background: var(--line);
+    position: relative;
+  }
+
+  .connector .line::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    bottom: -1px;
+    border-left: 3.5px solid transparent;
+    border-right: 3.5px solid transparent;
+    border-top: 5px solid var(--line);
+  }
+
+  .connector .label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.02em;
+  }
+
+  /* ---- generic card ---- */
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  .repo-card {
+    padding: 1rem 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .repo-card .name {
+    font-family: "Sora", sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .repo-card .meta {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .repo-card .tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2rem 0.65rem;
+  }
+
+  /* ---- netlify boundary ---- */
+
+  .boundary {
+    border: 1.5px dashed var(--netlify-line);
+    background: linear-gradient(180deg, var(--netlify-soft), transparent 140px);
+    border-radius: 20px;
+    padding: 1.5rem 1.5rem 1.7rem;
+    position: relative;
+  }
+
+  .boundary-tag {
+    position: absolute;
+    top: -13px;
+    left: 1.4rem;
+    background: var(--netlify);
+    color: #ffffff;
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+  }
+
+  .boundary-sub {
+    margin: 0.35rem 0 1.3rem;
+    color: var(--netlify-ink);
+    font-size: 0.86rem;
+    max-width: 56ch;
+  }
+
+  .netlify-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+  }
+
+  @media (max-width: 620px) {
+    .netlify-grid { grid-template-columns: 1fr; }
+  }
+
+  .n-card {
+    background: var(--surface);
+    border: 1px solid var(--netlify-line);
+    border-radius: 12px;
+    padding: 0.95rem 1.05rem 1.05rem;
+  }
+
+  .n-card .head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .n-card .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--netlify);
+    flex-shrink: 0;
+  }
+
+  .n-card h3 {
+    font-family: "Sora", sans-serif;
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin: 0;
+    letter-spacing: -0.005em;
+  }
+
+  .n-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.83rem;
+    line-height: 1.55;
+  }
+
+  .n-card .path {
+    display: block;
+    margin-top: 0.5rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.73rem;
+    color: var(--netlify-ink);
+    word-break: break-word;
+  }
+
+  .n-card .path + .path { margin-top: 0.3rem; }
+
+  /* ---- external row ---- */
+
+  .external-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+  }
+
+  @media (max-width: 620px) {
+    .external-row { grid-template-columns: 1fr; }
+  }
+
+  .x-card {
+    border: 1px dashed var(--external-line);
+    background: var(--external-soft);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+  }
+
+  .x-card h3 {
+    font-family: "Sora", sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin: 0 0 0.3rem;
+    color: var(--ink);
+  }
+
+  .x-card p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .section-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-soft);
+    margin: 0 0 0.7rem;
+  }
+
+  /* ---- escape hatch row ---- */
+
+  .hatch-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+  }
+
+  @media (max-width: 620px) {
+    .hatch-row { grid-template-columns: 1fr; }
+  }
+
+  .hatch-card {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 0.95rem 1.05rem;
+  }
+
+  .hatch-card h3 {
+    font-family: "Sora", sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin: 0 0 0.35rem;
+  }
+
+  .hatch-card p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .hatch-card .path {
+    display: block;
+    margin-top: 0.45rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.73rem;
+    color: var(--muted);
+  }
+
+  /* ---- legend ---- */
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.3rem;
+    margin-top: 2.6rem;
+    padding-top: 1.3rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .legend .item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .legend .swatch {
+    width: 13px;
+    height: 13px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .swatch.repo { background: var(--muted-soft); }
+  .swatch.netlify { background: var(--netlify); }
+  .swatch.external { background: transparent; border: 1.5px dashed var(--external-line); }
+  .swatch.hatch { background: transparent; border: 1.5px solid var(--line); }
+
+  footer.note {
+    margin-top: 2.4rem;
+    font-size: 0.82rem;
+    color: var(--muted-soft);
+    max-width: 62ch;
+  }
+
+  footer.note a { color: inherit; }
+
+  /* ---- print / PDF ----
+     The screen layout is one continuous column; on paper it has to break
+     into pages without splitting a card or orphaning a section heading. */
+
+  @page {
+    size: A4;
+    margin: 14mm 12mm;
+  }
+
+  @media print {
+    :root {
+      /* Force the light palette — a reader's dark-mode PDF export would
+         otherwise bake dark surfaces into the printed page. */
+      --ink: #161a1d;
+      --paper: #ffffff;
+      --surface: #ffffff;
+      --line: #d9dedb;
+      --line-soft: #e7eae7;
+      --muted: #5c6660;
+      --muted-soft: #8b9490;
+      --netlify: #0e9c86;
+      --netlify-soft: #e6f5f1;
+      --netlify-ink: #076a5a;
+      --netlify-line: #b6e2d8;
+      --external: #8a7a5c;
+      --external-soft: #f4efe3;
+      --external-line: #ddd0b2;
+      --shadow: none;
+    }
+
+    body {
+      background: #ffffff;
+      font-size: 10.5pt;
+    }
+
+    .page {
+      max-width: none;
+      padding: 0;
+    }
+
+    /* Nothing that reads as a single object may be split across a page. */
+    .n-card,
+    .x-card,
+    .hatch-card,
+    .repo-card,
+    .connector,
+    .legend,
+    footer.note {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* A heading must never be the last thing on a page. */
+    .section-label,
+    .boundary-tag,
+    h1 {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    /* The boundary's gradient renders as a hard band where a page breaks,
+       so on paper it becomes a flat outline instead. */
+    .boundary {
+      background: none;
+      break-inside: auto;
+      padding-top: 1.7rem;
+    }
+
+    .boundary-tag {
+      position: static;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+
+    .netlify-grid {
+      gap: 0.6rem;
+    }
+
+    .external-row,
+    .hatch-row {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    header.top {
+      margin-bottom: 1.6rem;
+    }
+
+    .legend {
+      margin-top: 1.6rem;
+    }
+  }
+</style>
+
+<div class="page">
+
+  <header class="top">
+    <p class="eyebrow">Infrastructure map · WenMeet</p>
+    <h1>Every place this app touches Netlify</h1>
+    <p class="lede">
+      From <code>git push</code> to a served page. WenMeet's own code — the scheduling
+      engine, Clerk auth, the Next.js app — lives outside this map; what's shown here is
+      only the surface where that code meets Netlify's platform.
+    </p>
+  </header>
+
+  <div class="flow">
+
+    <div class="card repo-card">
+      <div>
+        <div class="name">github.com/ghettoeinstein/wenmeet</div>
+        <div class="meta">branch: main</div>
+      </div>
+      <span class="tag">git push → build trigger</span>
+    </div>
+
+    <div class="connector">
+      <span class="line"></span>
+      <span class="label">npm run build</span>
+    </div>
+
+    <div class="boundary">
+      <span class="boundary-tag">Netlify platform</span>
+      <p class="boundary-sub">
+        Everything in this box is provisioned and run by Netlify — configured once in
+        <span class="inline-code">netlify.toml</span> and Netlify's own dashboard, not in app code.
+      </p>
+
+      <div class="netlify-grid">
+
+        <div class="n-card">
+          <div class="head"><span class="dot"></span><h3>Build &amp; runtime</h3></div>
+          <p><span class="inline-code">@netlify/plugin-nextjs</span> builds the app and translates
+            every Next.js API route into a Netlify Function — stateless, cold-starting on demand.</p>
+          <span class="path">netlify.toml → [build] command, publish = ".next"</span>
+        </div>
+
+        <div class="n-card">
+          <div class="head"><span class="dot"></span><h3>Hosting &amp; domain</h3></div>
+          <p>Site <span class="inline-code">wenmeet-demo</span> serves the built app over Netlify's CDN,
+            with <span class="inline-code">wenmeet.conscience.fund</span> as a Netlify-managed custom
+            domain — DNS and TLS both handled by Netlify.</p>
+        </div>
+
+        <div class="n-card">
+          <div class="head"><span class="dot"></span><h3>Context &amp; config</h3></div>
+          <p>Per-environment values live in <span class="inline-code">netlify.toml</span> contexts, plus
+            Clerk / Google / Microsoft secrets set directly in Netlify's env var UI — never committed.</p>
+          <span class="path">[context.production.environment] DATA_STORE = "netlify"</span>
+          <span class="path">[context.deploy-preview.environment] DATA_STORE = "netlify"</span>
+        </div>
+
+        <div class="n-card">
+          <div class="head"><span class="dot"></span><h3>Netlify Database</h3></div>
+          <p>Managed Postgres, queried through <span class="inline-code">@netlify/database</span>'s raw
+            SQL client — no ORM. <span class="inline-code">NETLIFY_DB_URL</span> is injected
+            automatically; nothing to configure by hand.</p>
+          <span class="path">netlify/database/migrations/20260818200113_initial_schema.sql</span>
+        </div>
+
+        <div class="n-card">
+          <div class="head"><span class="dot"></span><h3>Deploy previews</h3></div>
+          <p>Every branch/PR gets its own preview URL and its own isolated database branch,
+            seeded from production — real persistence, safe to test against, torn down when
+            the branch closes.</p>
+        </div>
+
+        <div class="n-card">
+          <div class="head"><span class="dot"></span><h3>Functions → outside calls</h3></div>
+          <p>Deployed API routes are what actually reach out to Clerk and the calendar
+            providers below — Netlify runs the function, the destination isn't Netlify.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="connector">
+      <span class="line"></span>
+      <span class="label">Functions call out to</span>
+    </div>
+
+    <div>
+      <p class="section-label">Reached from inside Netlify Functions — not Netlify itself</p>
+      <div class="external-row">
+        <div class="x-card">
+          <h3>Clerk</h3>
+          <p>Sign-in / sign-up, session verification for every authenticated request.</p>
+        </div>
+        <div class="x-card">
+          <h3>Google Calendar API</h3>
+          <p>OAuth token exchange + read-only free/busy queries.</p>
+        </div>
+        <div class="x-card">
+          <h3>Microsoft Graph API</h3>
+          <p>OAuth token exchange + read-only free/busy queries (Outlook / 365).</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top: 2.4rem;">
+    <p class="section-label">Deliberately outside Netlify — same code, different host</p>
+    <div class="hatch-row">
+      <div class="hatch-card">
+        <h3>Plain local dev</h3>
+        <p><span class="inline-code">next dev</span> with no Netlify CLI falls back to
+          <span class="inline-code">DATA_STORE=memory</span> — an in-process store, no
+          database reachable, nothing persists across a restart.</p>
+      </div>
+      <div class="hatch-card">
+        <h3>Docker image</h3>
+        <p>A standalone multi-stage build that runs on any container host. Independent of
+          Netlify's build pipeline by design — must stay on
+          <span class="inline-code">DATA_STORE=memory</span>, since Netlify Database isn't
+          reachable outside Netlify's own runtime.</p>
+        <span class="path">Dockerfile</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="swatch repo"></span>Source</div>
+    <div class="item"><span class="swatch netlify"></span>Netlify-managed</div>
+    <div class="item"><span class="swatch external"></span>External service</div>
+    <div class="item"><span class="swatch hatch"></span>Runs outside Netlify</div>
+  </div>
+
+  <footer class="note">
+    Reflects <span class="inline-code">netlify.toml</span>, <span class="inline-code">package.json</span>,
+    and <span class="inline-code">netlify/database/migrations/</span> as committed today. Event creation
+    on connected calendars, the organizer invite flow, and a live production persistence round-trip are
+    still open items — noted in <span class="inline-code">HANDOFF.md</span> — and aren't specific to Netlify,
+    so they're left off this map.
+  </footer>
+
+</div>

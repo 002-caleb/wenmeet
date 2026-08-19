@@ -1,12 +1,13 @@
 :root {
   color-scheme: light dark;
 
-  --bg: #f3f4f7;
+  --bg: #f5f4f2;
   --surface: #ffffff;
-  --surface-muted: #eef0f4;
+  --surface-muted: #eef0ec;
   --text: #14161b;
   --text-muted: #6b7280;
-  --border: #e4e6ec;
+  --text-label: #3d4148;
+  --border: #e4e2dd;
 
   --accent: #3d63f5;
   --accent-strong: #2947d1;
@@ -25,6 +26,7 @@
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-pill: 999px;
+  --radius-btn: 10px;
 
   --shadow-sm: 0 1px 2px rgba(20, 22, 27, 0.04), 0 1px 1px rgba(20, 22, 27, 0.03);
   --shadow-md: 0 10px 30px -12px rgba(20, 22, 27, 0.18), 0 2px 8px rgba(20, 22, 27, 0.04);
@@ -38,6 +40,7 @@
     --surface-muted: #1d1f26;
     --text: #f2f3f5;
     --text-muted: #9a9ea8;
+    --text-label: #c7cdd3;
     --border: #2a2c34;
 
     --accent: #6a8bff;
@@ -179,10 +182,10 @@ code {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  border-radius: var(--radius-pill);
-  padding: 0.7rem 1.4rem;
-  font-size: 0.92rem;
+  gap: 0.45rem;
+  border-radius: var(--radius-btn);
+  padding: 0.58rem 1.05rem;
+  font-size: 0.88rem;
   font-weight: 600;
   text-decoration: none;
   border: 1px solid transparent;
@@ -197,7 +200,6 @@ code {
 .pill-button-primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
 .pill-button-primary:hover {
@@ -1088,5 +1090,520 @@ code {
   }
   .hero-split [data-hero-cta] {
     justify-content: center;
+  }
+}
+
+/* ---- Authenticated workspace (docs/WORKSPACE_V2.md) ----
+   Deliberately quieter than the marketing surface: borders and tonal
+   separation instead of elevation, rows instead of cards, and panels
+   reserved for the two components that represent bounded system state
+   (Needs Attention, Calendar Health). See §32-39. */
+
+.ws {
+  --ws-radius-panel: 12px;
+  --ws-radius-row: 8px;
+}
+
+/* Header (§8) */
+
+.ws-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.ws-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem;
+}
+
+.ws-counts {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-label);
+  margin: 0 0 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ws-subtitle {
+  color: var(--text-muted);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.ws-header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  text-align: right;
+  padding-top: 0.35rem;
+}
+
+.ws-meta-text {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.ws-meta-warn {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--stub-fg);
+  white-space: nowrap;
+}
+
+/* Grid — primary content dominates the utility rail (§26) */
+
+.ws-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 248px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .ws-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.ws-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  min-width: 0;
+}
+
+/* Section labels — sentence case, real contrast (§37) */
+
+.ws-section-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  color: var(--text-label);
+  margin: 0 0 0.6rem;
+}
+
+.ws-section-more {
+  margin-top: 0.75rem;
+}
+
+/* Panels — border + tone, no diffuse shadow (§35) */
+
+.ws-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--ws-radius-panel);
+}
+
+/* Needs Attention (§12-15) */
+
+.ws-attention-empty {
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.ws-attention-empty-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.3rem;
+}
+
+.ws-allclear-mark {
+  color: var(--ready-fg);
+  font-size: 0.9rem;
+}
+
+.ws-muted-line {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ws-quiet-action {
+  display: inline-block;
+  margin-top: 0.85rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.ws-quiet-action:hover {
+  text-decoration: underline;
+}
+
+.ws-attention-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.ws-attention-card {
+  padding: 1rem 1.15rem 1.05rem;
+  border-left: 3px solid var(--accent);
+}
+
+.ws-attention-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.ws-attention-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ws-attention-title:hover {
+  color: var(--accent);
+}
+
+.ws-attention-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-top: 0.7rem;
+}
+
+.ws-attention-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+}
+
+.ws-time-strong {
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status chips (§29) */
+
+.ws-chip {
+  flex-shrink: 0;
+  border-radius: 5px;
+  padding: 0.17rem 0.5rem;
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.ws-chip-ready {
+  background: var(--ready-bg);
+  color: var(--ready-fg);
+}
+
+.ws-chip-blocked {
+  background: var(--blocked-bg);
+  color: var(--blocked-fg);
+}
+
+/* Buttons — rectangular, unglowing (§9, §38) */
+
+.ws-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ws-btn-sm {
+  padding: 0.42rem 0.85rem;
+  font-size: 0.83rem;
+}
+
+.ws-btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.ws-btn-primary:hover {
+  background: var(--accent-strong);
+}
+
+/* Rows — Active and Upcoming carry no panel surface (§33) */
+
+.ws-rows {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.ws-empty-line {
+  padding: 0.9rem 0.15rem 0.2rem;
+}
+
+.ws-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 0.65rem;
+  margin: 0 -0.65rem;
+  border-radius: var(--ws-radius-row);
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text);
+  min-height: 56px;
+}
+
+.ws-row:hover {
+  background: var(--surface-muted);
+}
+
+.ws-row-title {
+  font-size: 0.94rem;
+  font-weight: 500;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ws-row-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.ws-state-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-label);
+  letter-spacing: 0.02em;
+}
+
+.ws-row-dot {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.ws-row-trail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+}
+
+.ws-row-chevron {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.ws-row:hover .ws-row-chevron {
+  color: var(--accent);
+}
+
+.ws-row-upcoming {
+  min-height: 48px;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+
+.ws-upcoming-time {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-label);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* Lifecycle education — shown once, then gone (§19) */
+
+.ws-lifecycle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.75rem;
+}
+
+.ws-lifecycle-steps {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-label);
+  letter-spacing: 0.01em;
+}
+
+.ws-lifecycle-arrow {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.ws-lifecycle-caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Role glyphs (§31) */
+
+.role-progress {
+  display: inline-flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.role-progress-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.role-symbol {
+  font-size: 0.7rem;
+}
+
+.role-symbol-required { color: var(--accent); }
+.role-symbol-kdm { color: var(--accent-strong); }
+.role-symbol-optional { color: var(--text-muted); }
+
+.role-progress-count {
+  color: var(--text-label);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Calendar health rail (§23-25) */
+
+.ws-calendar-panel {
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.ws-calendar-state {
+  font-size: 0.86rem;
+  font-weight: 600;
+  margin: 0 0 0.85rem;
+}
+
+.ws-calendar-state-idle { color: var(--stub-fg); }
+.ws-calendar-state-ok { color: var(--ready-fg); }
+
+.ws-calendar-rows {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ws-calendar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.84rem;
+}
+
+.ws-calendar-row-label {
+  color: var(--text);
+}
+
+.ws-calendar-connected {
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: var(--ready-fg);
+  white-space: nowrap;
+}
+
+.ws-calendar-connect {
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.ws-calendar-connect:hover {
+  text-decoration: underline;
+}
+
+.ws-calendar-tz {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.ws-calendar-tz-value {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* ---- Global pre-release notice (docs/WIP_BANNER.md) ----
+   Uses the existing amber status pair, which measures 4.9:1 on the light
+   ground and 8.2:1 on the dark one — both clear WCAG 2.2 AA for normal
+   text. The wording carries the meaning, so nothing depends on color
+   alone (§12). No animation, by requirement. */
+
+.site-status-banner {
+  width: 100%;
+  background: var(--stub-bg);
+  color: var(--stub-fg);
+  border-bottom: 1px solid color-mix(in srgb, var(--stub-fg) 22%, transparent);
+  padding: 0.5rem 1rem;
+  /* Flex rather than text-align: an inline-block sits on the parent's
+     text baseline and drags descender space with it, which pushed the bar
+     past its 28–34px height budget. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Belt-and-braces against horizontal overflow at 320px. */
+  overflow-wrap: anywhere;
+}
+
+.site-status-banner-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@media (max-width: 360px) {
+  .site-status-banner {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+  .site-status-banner-text {
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
   }
 }

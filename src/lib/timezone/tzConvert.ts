@@ -21,6 +21,16 @@ export function detectBrowserTimezone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
+/** "Los Angeles · PT" style label — falls back to the bare zone name for UTC or an unusual IANA id. */
+export function humanTimezoneLabel(timeZone: string): string {
+  if (timeZone === "UTC") return "UTC";
+  const city = timeZone.split("/").pop()?.replace(/_/g, " ") ?? timeZone;
+  const abbrev = new Intl.DateTimeFormat("en-US", { timeZone, timeZoneName: "short" })
+    .formatToParts(new Date())
+    .find((p) => p.type === "timeZoneName")?.value;
+  return abbrev ? `${city} · ${abbrev}` : city;
+}
+
 export interface TzConversionRow {
   timeZone: string;
   label: string;

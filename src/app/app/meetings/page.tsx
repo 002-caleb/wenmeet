@@ -22,7 +22,7 @@ export default async function MeetingsPage() {
           {meetings.map((m) => (
             <Link
               key={m.id}
-              href={`/meetings/${m.id}/availability`}
+              href={`/app/meetings/${m.id}`}
               className="card"
               style={{ padding: "1rem 1.25rem", display: "block", textDecoration: "none", color: "var(--text)" }}
             >

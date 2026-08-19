@@ -11,6 +11,12 @@
   # across a Netlify Functions cold start.
   DATA_STORE = "memory"
 
+  # Pre-release notice on every public and authenticated page. NEXT_PUBLIC_*
+  # values are inlined at build time, so this must live in the build
+  # environment — setting it only at runtime would leave the banner off.
+  # Flip to "false" at launch; no code change required.
+  NEXT_PUBLIC_WIP_MODE = "true"
+
 [context.production.environment]
   # Netlify Database (managed Postgres) — schema applied automatically
   # from netlify/database/migrations/ on deploy. See README.

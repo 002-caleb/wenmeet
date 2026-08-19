@@ -1,58 +1,78 @@
-import Link from "next/link";
 import { getOrCreateCurrentParticipant } from "@/lib/auth/currentParticipant";
 import { getStore } from "@/lib/store";
-import { formatDateRangeLabel } from "@/lib/copy/dateLabels";
+import { loadWorkspaceView, type WorkspaceView } from "@/lib/dashboard/workspaceView";
+import { humanTimezoneLabel } from "@/lib/timezone/tzConvert";
+import { AttentionSection } from "@/components/dashboard/AttentionSection";
+import { ActiveSection } from "@/components/dashboard/ActiveSection";
+import { UpcomingSection } from "@/components/dashboard/UpcomingSection";
+import { CalendarHealthPanel } from "@/components/dashboard/CalendarHealthPanel";
+
+const EMPTY_VIEW: WorkspaceView = { attention: [], active: [], upcoming: [], totalMeetings: 0 };
 
 /**
- * Authenticated home (docs/AUTHENTICATED_APP_SHELL_ROUTING.md §5-6). Once
- * the Clerk <-> Participant bridge exists, this page has real data to show
- * — but only for meetings *this organizer created*. A populated "Needs you
- * / Waiting / Upcoming" inbox (§15-16) also needs per-participant response
- * tracking across meetings you're *invited to*, which isn't wired yet —
- * that's the next real step, not a UI-only one.
+ * Authenticated home — a thin operational layer over the coordination
+ * engine (docs/WORKSPACE_V2.md §1-2).
+ *
+ * Zero-data and populated accounts render the exact same component tree;
+ * each section simply receives an empty array (§27-28). There is no
+ * separate onboarding page, and no section invents state the store didn't
+ * report.
  */
 export default async function AppHomePage() {
   const organizer = await getOrCreateCurrentParticipant();
-  const meetings = organizer ? await getStore().getMeetingsByOrganizer(organizer.id) : [];
+  const store = getStore();
 
-  if (meetings.length === 0) {
-    return (
-      <div style={{ textAlign: "center", paddingTop: "3rem" }}>
-        <h1 style={{ fontSize: "1.6rem", fontWeight: 800, letterSpacing: "-0.01em", margin: "0 0 0.6rem" }}>
-          Schedule something.
-        </h1>
-        <p style={{ color: "var(--text-muted)", maxWidth: 420, margin: "0 auto 1.75rem", lineHeight: 1.6 }}>
-          Choose your times, share one link, and let WenMeet find the overlap.
-        </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "0.75rem", flexWrap: "wrap" }}>
-          <Link href="/app/new" className="pill-button pill-button-primary">
-            Create your first WenMeet &rarr;
-          </Link>
-          <Link href="/app/calendars" className="pill-button pill-button-secondary">
-            Connect a calendar
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const [workspace, google, microsoft] = organizer
+    ? await Promise.all([
+        loadWorkspaceView(store, organizer.id),
+        store.getCalendarConnection(organizer.id, "google"),
+        store.getCalendarConnection(organizer.id, "microsoft"),
+      ])
+    : [EMPTY_VIEW, null, null];
+
+  const timezone = organizer?.timezone ?? "UTC";
+  const tzLabel = humanTimezoneLabel(timezone);
+  const isFirstRun = workspace.totalMeetings === 0;
+  const todayLabel = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    month: "short",
+    day: "numeric",
+  }).format(new Date());
+
+  const calendarsConnected = [google, microsoft].filter(Boolean).length;
 
   return (
-    <div>
-      <h1 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 1.25rem" }}>Your WenMeets</h1>
-      <div style={{ display: "grid", gap: "0.75rem" }}>
-        {meetings.map((m) => (
-          <Link
-            key={m.id}
-            href={`/meetings/${m.id}/availability`}
-            className="card"
-            style={{ padding: "1rem 1.25rem", display: "block", textDecoration: "none", color: "var(--text)" }}
-          >
-            <div style={{ fontWeight: 700 }}>{m.title}</div>
-            <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
-              {formatDateRangeLabel(new Date(m.windowStartUtc), new Date(m.windowEndUtc))}
-            </div>
-          </Link>
-        ))}
+    <div className="ws">
+      <header className="ws-header">
+        <div>
+          <h1 className="ws-title">Your meetings</h1>
+          <p className="ws-counts">
+            {workspace.active.length + workspace.attention.length} active &middot; {workspace.upcoming.length} upcoming
+          </p>
+          <p className="ws-subtitle">Coordinate the people who actually need to be there.</p>
+        </div>
+        <div className="ws-header-meta">
+          <span className="ws-meta-text">
+            {todayLabel} &middot; {tzLabel}
+          </span>
+          <span className={calendarsConnected > 0 ? "ws-meta-text" : "ws-meta-warn"}>
+            {calendarsConnected > 0
+              ? `${calendarsConnected} calendar${calendarsConnected === 1 ? "" : "s"} connected`
+              : "No calendar connected"}
+          </span>
+        </div>
+      </header>
+
+      <div className="ws-grid">
+        <div className="ws-primary">
+          <AttentionSection items={workspace.attention} timezone={timezone} isFirstRun={isFirstRun} />
+          <ActiveSection items={workspace.active} isFirstRun={isFirstRun} />
+          <UpcomingSection items={workspace.upcoming} timezone={timezone} />
+        </div>
+
+        <aside className="ws-rail">
+          <CalendarHealthPanel google={google} microsoft={microsoft} timezoneLabel={tzLabel} />
+        </aside>
       </div>
     </div>
   );

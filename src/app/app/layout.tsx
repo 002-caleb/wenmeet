@@ -32,7 +32,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </nav>
-      <main id="main" style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1.5rem" }}>{children}</main>
+      <main id="main" style={{ maxWidth: 1040, margin: "0 auto", padding: "2rem 1.5rem" }}>{children}</main>
     </div>
   );
 }
