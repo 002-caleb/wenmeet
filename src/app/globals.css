@@ -514,7 +514,7 @@ code {
 }
 
 .compare-panel {
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   border: 1px solid var(--border);
 }
@@ -712,5 +712,381 @@ code {
 @media (prefers-reduced-motion: reduce) {
   .tile {
     transition: none;
+  }
+}
+
+/* ---- Accessibility utility ---- */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Landing-page CTA buttons ----
+   Deliberately separate from .pill-button (used across the authenticated
+   app) — docs/LANDING_PAGE_DESIGN_PRD.md §7/§22 wants a restrained
+   10-12px radius here, not a full capsule, and that's scoped to the
+   marketing page only (redesigning the app is an explicit non-goal). */
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 11px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cta-button:active {
+  transform: scale(0.97);
+}
+
+.cta-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+.cta-primary:hover {
+  background: var(--accent-strong);
+}
+
+.cta-secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.cta-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---- Resolver (hero + scenario explorer product visualization) ---- */
+
+.resolver-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.45rem;
+}
+
+.resolver-candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.resolver-candidate {
+  padding: 0.45rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: opacity 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.resolver-candidate-blocked {
+  opacity: 0.45;
+  border-style: dashed;
+  text-decoration: line-through;
+  text-decoration-color: var(--blocked-fg);
+}
+
+.resolver-candidate-winner {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  text-decoration: none;
+  opacity: 1;
+}
+
+.resolver-candidate-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--blocked-fg);
+}
+
+.resolver-participants {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.resolver-participants li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.resolver-role {
+  font-size: 0.9rem;
+  line-height: 1;
+  width: 1.1rem;
+  text-align: center;
+}
+
+.resolver-role-required,
+.resolver-role-decision {
+  color: var(--accent);
+}
+
+.resolver-role-optional {
+  color: var(--text-muted);
+}
+
+.resolver-role-label {
+  margin-left: auto;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.resolver-best-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.resolver-best-time {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0.4rem 0 0.2rem;
+  font-variant-numeric: tabular-nums;
+  min-height: 1.9rem;
+}
+
+.resolver-location {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+
+.resolver-state-line {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.9rem;
+}
+
+.resolver-state-line strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.resolver-why {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.resolver-explanation {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ---- Scenario tabs ---- */
+
+.scenario-tabs {
+  display: inline-flex;
+  gap: 0.3rem;
+  padding: 0.25rem;
+  border-radius: 10px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+}
+
+.scenario-tab {
+  padding: 0.45rem 1rem;
+  border-radius: 7px;
+  border: none;
+  background: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.scenario-tab-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- Workflow diagram ---- */
+
+.workflow-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  min-width: 108px;
+  text-align: center;
+}
+
+.workflow-step-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.workflow-step-detail {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.workflow-arrow {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+@media (max-width: 720px) {
+  .workflow-flow {
+    flex-direction: column;
+  }
+  .workflow-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+/* ---- Interoperability system diagram ---- */
+
+.interop-diagram {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .interop-diagram {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+.interop-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.interop-node {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.interop-node svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.interop-hub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.8rem;
+  text-align: center;
+  box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+/* ---- Privacy / trust section (dark tonal break) ---- */
+
+.privacy-section {
+  background: #0f1116;
+  color: #f2f3f5;
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.privacy-section p {
+  color: rgba(242, 243, 245, 0.68);
+}
+
+/* ---- Hero asymmetric split (docs/LANDING_PAGE_DESIGN_PRD.md §8) ---- */
+
+.hero-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .hero-split {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero-split [data-hero-cta] {
+    justify-content: center;
   }
 }
