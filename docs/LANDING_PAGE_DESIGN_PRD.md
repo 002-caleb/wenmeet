@@ -129,7 +129,7 @@ Compact system diagram, not five stacked explanatory steps: **Choose â†’ Share â
 
 ## 16. Share-Link Requirement
 
-Represented inside the workflow, not a standalone section. Example: `wenmeet.com/m/strategy-7KQ4` + Copy. Supporting: **Anyone can respond. No account required.**
+Represented inside the workflow, not a standalone section. Example: `your-wenmeet-domain/m/strategy-7KQ4` + Copy. Supporting: **Anyone can respond. No account required.**
 
 ## 17. Interoperability Component
 

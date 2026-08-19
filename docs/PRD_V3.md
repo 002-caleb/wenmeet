@@ -41,7 +41,7 @@ The organizer should be able to create and share a WenMeet in approximately 20â€
 
 ### 3.2 The shareable link is the product's distribution object
 
-Every meeting receives a short, high-entropy URL (`wenmeet.com/m/7KQ4P...`), pasteable into any messaging system. Recipients should not need an explanation of WenMeet before responding.
+Every meeting receives a short, high-entropy URL (`your-wenmeet-domain/m/7KQ4P...`), pasteable into any messaging system. Recipients should not need an explanation of WenMeet before responding.
 
 ### 3.3 Calendar connection improves the experience but must not gate participation
 
