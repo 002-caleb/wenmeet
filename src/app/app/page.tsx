@@ -6,6 +6,7 @@ import { AttentionSection } from "@/components/dashboard/AttentionSection";
 import { ActiveSection } from "@/components/dashboard/ActiveSection";
 import { UpcomingSection } from "@/components/dashboard/UpcomingSection";
 import { CalendarHealthPanel } from "@/components/dashboard/CalendarHealthPanel";
+import { FirstRunOnboarding } from "@/components/onboarding/FirstRunOnboarding";
 
 const EMPTY_VIEW: WorkspaceView = { attention: [], active: [], upcoming: [], totalMeetings: 0 };
 
@@ -43,6 +44,7 @@ export default async function AppHomePage() {
 
   return (
     <div className="ws">
+      <FirstRunOnboarding enabled={isFirstRun} timezoneLabel={tzLabel} hasCalendar={calendarsConnected > 0} />
       <header className="ws-header">
         <div>
           <h1 className="ws-title">Your meetings</h1>

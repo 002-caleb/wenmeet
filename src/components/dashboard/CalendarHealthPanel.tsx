@@ -18,7 +18,7 @@ export function CalendarHealthPanel({ google, microsoft, timezoneLabel }: Calend
   const isSetup = connectedCount === 0;
 
   return (
-    <section aria-labelledby="ws-calendar">
+    <section aria-labelledby="ws-calendar" data-tour="calendar" data-help-tip="Keep your busy times accurate">
       <h2 id="ws-calendar" className="ws-section-label">
         {isSetup ? "Calendar setup" : "Calendar status"}
       </h2>

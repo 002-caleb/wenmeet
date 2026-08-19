@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, type PointerEvent } from "react";
 import type { DateRangeNavigationViewModel } from "@/lib/copy/dateRangeNav";
 
 export function DateRangeNavigator({
@@ -11,42 +12,43 @@ export function DateRangeNavigator({
   onPrevious: () => void;
   onNext: () => void;
 }) {
+  const pointerStart = useRef<number | null>(null);
+
+  function finishSwipe(event: PointerEvent<HTMLDivElement>) {
+    if (pointerStart.current === null) return;
+    const distance = event.clientX - pointerStart.current;
+    pointerStart.current = null;
+    if (Math.abs(distance) < 42) return;
+    if (distance < 0 && vm.canGoNext) onNext();
+    if (distance > 0 && vm.canGoPrevious) onPrevious();
+  }
+
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem", margin: "0.75rem 0" }}>
+    <div
+      className="date-range-navigator"
+      onPointerDown={(event) => { pointerStart.current = event.clientX; }}
+      onPointerUp={finishSwipe}
+      onPointerCancel={() => { pointerStart.current = null; }}
+    >
       <button
         type="button"
         onClick={onPrevious}
         disabled={!vm.canGoPrevious}
         aria-label="Earlier dates"
-        style={navButtonStyle(vm.canGoPrevious)}
+        className="date-range-button"
       >
         &lsaquo;
       </button>
-      <span style={{ fontWeight: 600, fontSize: "0.9rem", minWidth: 110, textAlign: "center" }}>{vm.label}</span>
+      <span className="date-range-label" aria-live="polite">{vm.label}</span>
       <button
         type="button"
         onClick={onNext}
         disabled={!vm.canGoNext}
         aria-label="Later dates"
-        style={navButtonStyle(vm.canGoNext)}
+        className="date-range-button"
       >
         &rsaquo;
       </button>
     </div>
   );
-}
-
-function navButtonStyle(enabled: boolean): React.CSSProperties {
-  return {
-    width: 30,
-    height: 30,
-    borderRadius: "50%",
-    border: "1px solid var(--border)",
-    background: "var(--surface)",
-    color: enabled ? "var(--text)" : "var(--text-muted)",
-    fontSize: "1.1rem",
-    lineHeight: 1,
-    cursor: enabled ? "pointer" : "not-allowed",
-    opacity: enabled ? 1 : 0.4,
-  };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 
 export interface AvailabilityDay {
   /** Stable key, e.g. an ISO date string — used to build cell keys. */
@@ -33,8 +33,10 @@ export function cellKey(dayKey: string, time: string) {
  */
 export function AvailabilityGrid({ days, times, busy, disabledPast, value, onChange }: AvailabilityGridProps) {
   const draggingRef = useRef(false);
+  const gridRef = useRef<HTMLDivElement>(null);
   const modeRef = useRef<"add" | "remove">("add");
   const valueRef = useRef(value);
+  const [isPainting, setIsPainting] = useState(false);
   valueRef.current = value;
 
   const isLocked = useMemo(() => {
@@ -61,12 +63,15 @@ export function AvailabilityGrid({ days, times, busy, disabledPast, value, onCha
     }
     function handleUp() {
       draggingRef.current = false;
+      setIsPainting(false);
     }
     window.addEventListener("pointermove", handleMove);
     window.addEventListener("pointerup", handleUp);
+    window.addEventListener("pointercancel", handleUp);
     return () => {
       window.removeEventListener("pointermove", handleMove);
       window.removeEventListener("pointerup", handleUp);
+      window.removeEventListener("pointercancel", handleUp);
     };
   }, [isLocked, onChange]);
 
@@ -77,17 +82,32 @@ export function AvailabilityGrid({ days, times, busy, disabledPast, value, onCha
     onChange(next);
   }
 
-  function handlePointerDown(key: string) {
+  function handlePointerDown(key: string, event: ReactPointerEvent<HTMLButtonElement>) {
     if (isLocked(key)) return;
+    event.preventDefault();
     modeRef.current = value.has(key) ? "remove" : "add";
     draggingRef.current = true;
+    setIsPainting(true);
+    if ("vibrate" in navigator) navigator.vibrate(8);
     toggle(key);
+  }
+
+  function trackPointer(event: ReactPointerEvent<HTMLDivElement>) {
+    const bounds = gridRef.current?.getBoundingClientRect();
+    if (!bounds) return;
+    gridRef.current?.style.setProperty("--pointer-x", `${event.clientX - bounds.left}px`);
+    gridRef.current?.style.setProperty("--pointer-y", `${event.clientY - bounds.top}px`);
   }
 
   const columns = `64px repeat(${days.length}, 1fr)`;
 
   return (
-    <div className="avail-grid">
+    <div
+      ref={gridRef}
+      className={`avail-grid${isPainting ? " avail-grid-painting" : ""}`}
+      onPointerMove={trackPointer}
+      aria-label="Availability grid. Click or drag across times to paint your availability."
+    >
       <div className="avail-grid-row avail-grid-head" style={{ gridTemplateColumns: columns }}>
         <div />
         {days.map((d) => {
@@ -101,10 +121,10 @@ export function AvailabilityGrid({ days, times, busy, disabledPast, value, onCha
           );
         })}
       </div>
-      {times.map((t) => (
+      {times.map((t, timeIndex) => (
         <div key={t} className="avail-grid-row" style={{ gridTemplateColumns: columns }}>
           <div className="avail-grid-time">{t}</div>
-          {days.map((d) => {
+          {days.map((d, dayIndex) => {
             const key = cellKey(d.key, t);
             const isBusy = busy?.has(key);
             const isPast = disabledPast?.has(key);
@@ -116,7 +136,7 @@ export function AvailabilityGrid({ days, times, busy, disabledPast, value, onCha
                 type="button"
                 data-cell-key={key}
                 disabled={locked}
-                onPointerDown={() => handlePointerDown(key)}
+                onPointerDown={(event) => handlePointerDown(key, event)}
                 onKeyDown={(e) => {
                   if ((e.key === "Enter" || e.key === " ") && !locked) {
                     e.preventDefault();
@@ -124,6 +144,7 @@ export function AvailabilityGrid({ days, times, busy, disabledPast, value, onCha
                   }
                 }}
                 className={`avail-cell${selected ? " avail-cell-selected" : ""}${isBusy ? " avail-cell-busy" : ""}${isPast ? " avail-cell-disabled" : ""}`}
+                style={{ "--flow-index": dayIndex + timeIndex } as CSSProperties}
                 aria-pressed={selected}
                 aria-label={`${d.weekday} ${d.dateNum}, ${t}${isBusy ? ", busy on your calendar" : isPast ? ", already past" : selected ? ", selected" : ", available"}`}
               >

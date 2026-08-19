@@ -10,7 +10,7 @@ import { RoleProgress, roleProgressSentence } from "./RoleProgress";
  */
 export function ActiveSection({ items, isFirstRun }: { items: MeetingSummary[]; isFirstRun: boolean }) {
   return (
-    <section aria-labelledby="ws-active" className="ws-section">
+    <section aria-labelledby="ws-active" className="ws-section" data-tour="pipeline" data-help-tip="Collecting → Ready → Booked">
       <h2 id="ws-active" className="ws-section-label">
         Active
       </h2>

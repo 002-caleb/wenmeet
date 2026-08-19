@@ -18,7 +18,7 @@ interface AttentionSectionProps {
  */
 export function AttentionSection({ items, timezone, isFirstRun }: AttentionSectionProps) {
   return (
-    <section aria-labelledby="ws-attention">
+    <section aria-labelledby="ws-attention" data-tour="attention" data-help-tip="Decisions that need you appear here">
       <h2 id="ws-attention" className="ws-section-label">
         Needs attention
       </h2>

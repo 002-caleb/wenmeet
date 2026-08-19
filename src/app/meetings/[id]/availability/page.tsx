@@ -167,7 +167,7 @@ export default function AvailabilityPage() {
   }
 
   return (
-    <main id="main" style={{ maxWidth: 640 }}>
+    <main id="main" className="availability-page">
       <Link href="/" style={{ fontSize: "0.85rem", color: "var(--text-muted)", textDecoration: "none" }}>
         &larr; WenMeet
       </Link>
@@ -220,7 +220,9 @@ export default function AvailabilityPage() {
         <CalendarStatus connected={calendarConnected} onConnect={() => setCalendarConnected(true)} />
       </div>
 
-      <div style={{ overflowX: "auto", paddingBottom: "0.25rem" }}>
+      <p className="availability-gesture-hint"><span aria-hidden="true">↗</span> Drag across the grid to paint your times</p>
+
+      <div className="availability-grid-scroll">
         <AvailabilityGrid days={gridDays} times={TIMES} busy={busy} disabledPast={disabledPast} value={selected} onChange={setSelected} />
       </div>
 

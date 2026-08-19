@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { UserButton } from "@clerk/nextjs";
 import { getOrCreateCurrentParticipant } from "@/lib/auth/currentParticipant";
 import { AppNavLinks } from "@/components/AppNavLinks";
+import { HelpCenter } from "@/components/help/HelpCenter";
+import { getStore } from "@/lib/store";
 
 /**
  * Application shell (docs/AUTHENTICATED_APP_SHELL_ROUTING.md §7, §13).
@@ -14,7 +16,14 @@ import { AppNavLinks } from "@/components/AppNavLinks";
  * already guarantees a session exists here, so this is a plain find-or-create.
  */
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  await getOrCreateCurrentParticipant();
+  const participant = await getOrCreateCurrentParticipant();
+  const store = getStore();
+  const [google, microsoft] = participant
+    ? await Promise.all([
+        store.getCalendarConnection(participant.id, "google"),
+        store.getCalendarConnection(participant.id, "microsoft"),
+      ])
+    : [null, null];
 
   return (
     <div style={{ minHeight: "100dvh" }}>
@@ -26,7 +35,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
           <div className="app-nav-right">
             {/* Label shortens on narrow screens so the nav can't overflow. */}
-            <Link href="/app/new" className="pill-button pill-button-primary app-nav-cta">
+            <Link href="/app/new" className="pill-button pill-button-primary app-nav-cta" data-tour="new">
               <span className="app-nav-cta-full">+ New WenMeet</span>
               <span className="app-nav-cta-short">+ New</span>
             </Link>
@@ -35,6 +44,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </nav>
       <main id="main" style={{ maxWidth: 1040, margin: "0 auto", padding: "2rem 1.5rem" }}>{children}</main>
+      <HelpCenter hasCalendar={Boolean(google || microsoft)} />
     </div>
   );
 }

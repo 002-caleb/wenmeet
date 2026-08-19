@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getStore } from "@/lib/store";
 import { isValidShareTokenShape } from "@/lib/shareToken";
 import { RespondFlow } from "@/components/participant/RespondFlow";
+import { ParticipantGrowthPrompt } from "@/components/participant/ParticipantGrowthPrompt";
 
 export const metadata = {
   title: "Share your availability · WenMeet",
@@ -36,6 +37,7 @@ export default async function ShareLinkPage({ params }: { params: Promise<{ toke
           <p className="ws-muted-line">
             {meeting.title} has a confirmed time, so it&rsquo;s no longer collecting availability.
           </p>
+          <ParticipantGrowthPrompt />
         </div>
       </main>
     );

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AvailabilityGrid, cellKey, type AvailabilityDay } from "@/components/AvailabilityGrid";
+import { ParticipantGrowthPrompt } from "./ParticipantGrowthPrompt";
 import { detectBrowserTimezone, humanTimezoneLabel } from "@/lib/timezone/tzConvert";
 import { addDays, formatDateKey, formatWeekdayShort, isSameDay, parseHourLabel, startOfDay } from "@/lib/copy/dateLabels";
 import type { TimeSlot } from "@/lib/types";
@@ -123,6 +124,7 @@ export function RespondFlow({ token, title, organizerName, windowStartUtc, windo
         <p className="ws-muted-line">
           {organizerName} will see your availability. You&rsquo;ll hear back once a time is settled.
         </p>
+        <ParticipantGrowthPrompt />
       </div>
     );
   }
