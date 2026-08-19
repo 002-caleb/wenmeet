@@ -1840,3 +1840,190 @@ code {
     display: inline;
   }
 }
+
+/* Footer brand attribution — purple to separate it from the blue product
+   accent, so it reads as the parent company rather than a product action. */
+
+.footer-brand-link {
+  color: #7c5cff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-brand-link:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+  .footer-brand-link {
+    color: #a78bfa;
+  }
+}
+
+/* ---- Participant response page (/m/:token) ---- */
+
+.respond-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+.respond-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.respond-header .ws-title {
+  margin-bottom: 0.4rem;
+}
+
+.respond-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 560px) {
+  .respond-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.respond-field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.respond-field input {
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 400;
+  min-height: 44px;
+}
+
+.respond-grid-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.respond-grid-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 0.2rem;
+}
+
+.respond-nav {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.respond-nav button {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.respond-nav button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.respond-error {
+  color: var(--blocked-fg);
+  font-size: 0.86rem;
+  margin: 0;
+}
+
+.respond-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+}
+
+.respond-done {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.respond-done-mark {
+  font-size: 1.75rem;
+  color: var(--ready-fg);
+  margin: 0 0 0.5rem;
+}
+
+.respond-done-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+/* ---- Organizer share panel ---- */
+
+.share-panel {
+  padding: 1rem 1.15rem 1.1rem;
+}
+
+.share-link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.share-link-url {
+  flex: 1 1 220px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  background: var(--surface-muted);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.82rem;
+}
+
+.respondent-list {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.respondent-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+}
+
+.respondent-check {
+  color: var(--ready-fg);
+}
+
+/* Landing: sample link is illustrative, not copyable. */
+
+.link-copy-sample {
+  flex-wrap: wrap;
+}
+
+.link-copy-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}

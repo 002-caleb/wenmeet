@@ -7,6 +7,7 @@ import { describeAttention, describeLifecycle } from "@/lib/copy/statusCopy";
 import { formatDateRangeLabel } from "@/lib/copy/dateLabels";
 import { formatInTimezone } from "@/lib/timezone/tzConvert";
 import { RoleProgress } from "@/components/dashboard/RoleProgress";
+import { ShareLinkPanel } from "@/components/dashboard/ShareLinkPanel";
 
 /**
  * Organizer meeting detail — where the dashboard's attention and active
@@ -27,6 +28,17 @@ export default async function MeetingDetailPage({ params }: { params: Promise<{ 
   if (!meeting || meeting.organizerId !== organizer.id) notFound();
 
   const summary = await buildMeetingSummary(store, meeting);
+
+  // Who has actually replied — resolved from availability rows, so a name
+  // only appears once that person genuinely submitted times.
+  const availability = await store.getAvailabilityForMeeting(meeting.id);
+  const respondents = (
+    await Promise.all(
+      availability
+        .filter((a) => a.participantId !== meeting.organizerId)
+        .map((a) => store.getParticipant(a.participantId)),
+    )
+  ).filter((p): p is NonNullable<typeof p> => p !== null);
   const attention = summary.attentionReason ? describeAttention(summary.attentionReason) : null;
   const time = summary.scheduledTimeUtc ?? summary.recommendedTimeUtc;
   const timezone = organizer.timezone;
@@ -69,6 +81,8 @@ export default async function MeetingDetailPage({ params }: { params: Promise<{ 
         </div>
       )}
 
+      {meeting.status !== "locked" && <ShareLinkPanel shareToken={meeting.shareToken} />}
+
       <section aria-labelledby="md-participants">
         <h2 id="md-participants" className="ws-section-label">
           Participants
@@ -80,10 +94,18 @@ export default async function MeetingDetailPage({ params }: { params: Promise<{ 
               <p className="ws-muted-line" style={{ marginTop: "0.7rem" }}>
                 {summary.responseCount} of {summary.participantCount} responded.
               </p>
+              <ul className="respondent-list">
+                {respondents.map((r) => (
+                  <li key={r.id}>
+                    <span aria-hidden className="respondent-check">&#10003;</span>
+                    {r.name}
+                  </li>
+                ))}
+              </ul>
             </>
           ) : (
             <p className="ws-muted-line">
-              Just you so far &mdash; inviting other participants isn&rsquo;t available yet.
+              No responses yet. Share the link above and they&rsquo;ll show up here as people reply.
             </p>
           )}
         </div>

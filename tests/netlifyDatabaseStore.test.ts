@@ -49,6 +49,7 @@ describe("NetlifyDatabaseStore", () => {
     const required = await store.createParticipant({ name: "Req", email: "req@example.com", timezone: "UTC" });
 
     const meeting = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title: "Strategy Call",
       organizerId: organizer.id,
       windowStartUtc: "2026-08-18T00:00:00.000Z",
@@ -86,6 +87,7 @@ describe("NetlifyDatabaseStore", () => {
   test("upserts availability and increments version on resubmission", async () => {
     const organizer = await store.createParticipant({ name: "O2", email: "o2@example.com", timezone: "UTC" });
     const meeting = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title: "Sync",
       organizerId: organizer.id,
       windowStartUtc: "2026-08-18T00:00:00.000Z",
@@ -127,6 +129,7 @@ describe("NetlifyDatabaseStore", () => {
     const organizer = await store.createParticipant({ name: "O3", email: "o3@example.com", timezone: "UTC" });
     const participant = await store.createParticipant({ name: "P3", email: "p3@example.com", timezone: "UTC" });
     const meeting = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title: "Waiver test",
       organizerId: organizer.id,
       windowStartUtc: "2026-08-18T00:00:00.000Z",
@@ -153,6 +156,7 @@ describe("NetlifyDatabaseStore", () => {
   test("creates and updates a scheduling snapshot, preserving jsonb and uuid[] round-trip", async () => {
     const organizer = await store.createParticipant({ name: "O4", email: "o4@example.com", timezone: "UTC" });
     const meeting = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title: "Snapshot test",
       organizerId: organizer.id,
       windowStartUtc: "2026-08-18T00:00:00.000Z",

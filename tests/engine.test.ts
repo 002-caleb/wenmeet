@@ -11,6 +11,7 @@ function availability(participantId: string, slots: Availability["slots"]): Avai
     status: "confirmed",
     submittedTimezone: "UTC",
     updatedAt: new Date().toISOString(),
+    version: 1,
   };
 }
 

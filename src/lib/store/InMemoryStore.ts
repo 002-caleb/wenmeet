@@ -46,6 +46,14 @@ export class InMemoryStore implements NebulaStore {
     return null;
   }
 
+  async getParticipantByEmail(email: string): Promise<Participant | null> {
+    const needle = email.trim().toLowerCase();
+    for (const p of this.participants.values()) {
+      if (p.email.trim().toLowerCase() === needle) return p;
+    }
+    return null;
+  }
+
   async updateParticipantTimezone(id: string, timezone: string): Promise<Participant> {
     const existing = this.participants.get(id);
     if (!existing) throw new Error(`Participant ${id} not found`);
@@ -62,6 +70,13 @@ export class InMemoryStore implements NebulaStore {
 
   async getMeeting(id: string): Promise<Meeting | null> {
     return this.meetings.get(id) ?? null;
+  }
+
+  async getMeetingByShareToken(shareToken: string): Promise<Meeting | null> {
+    for (const m of this.meetings.values()) {
+      if (m.shareToken === shareToken) return m;
+    }
+    return null;
   }
 
   async updateMeeting(id: string, patch: Partial<Meeting>): Promise<Meeting> {

@@ -23,11 +23,15 @@ export interface NebulaStore {
   createParticipant(p: Omit<Participant, "id">): Promise<Participant>;
   getParticipant(id: string): Promise<Participant | null>;
   getParticipantByClerkUserId(clerkUserId: string): Promise<Participant | null>;
+  /** Email is the natural key for participants who respond via a link without an account. */
+  getParticipantByEmail(email: string): Promise<Participant | null>;
   updateParticipantTimezone(id: string, timezone: string): Promise<Participant>;
 
   // Meetings
   createMeeting(m: Omit<Meeting, "id" | "createdAt">): Promise<Meeting>;
   getMeeting(id: string): Promise<Meeting | null>;
+  /** Resolves the public participant link (/m/:token). */
+  getMeetingByShareToken(shareToken: string): Promise<Meeting | null>;
   updateMeeting(id: string, patch: Partial<Meeting>): Promise<Meeting>;
   getMeetingsByOrganizer(organizerId: string): Promise<Meeting[]>;
 

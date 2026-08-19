@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -9,8 +9,7 @@ import { MeetingResolver } from "@/components/landing/MeetingResolver";
 import { ScenarioExplorer } from "@/components/landing/ScenarioExplorer";
 import { RESOLVER_SCENARIOS, ROLE_LABEL, ROLE_SYMBOL, type RoleKind } from "@/lib/landing/resolverScenarios";
 
-const DEMO_HREF = "/meetings/demo/availability";
-const DEMO_LINK = "wenmeet.com/m/strategy-7KQ4";
+const DEMO_LINK = "wenmeet.conscience.fund/m/…";
 const HERO_SCENARIO = RESOLVER_SCENARIOS[0]!;
 
 const WORKFLOW_STEPS = [
@@ -18,7 +17,10 @@ const WORKFLOW_STEPS = [
   { label: "Share", detail: "Send one link." },
   { label: "Respond", detail: "No account needed." },
   { label: "Resolve", detail: "Earliest time everyone required is free." },
-  { label: "Book", detail: "Lands on every calendar." },
+  // Deliberately describes the result WenMeet produces, not a calendar
+  // write — booking to Google/Microsoft needs write scopes the app does
+  // not request yet, so claiming it would be marketing something unbuilt.
+  { label: "Confirm", detail: "Everyone sees the agreed time." },
 ];
 
 const CALENDAR_PROVIDERS = ["Google Calendar", "Microsoft Outlook / 365"];
@@ -30,7 +32,6 @@ const FINAL_STEPS = ["Create your availability.", "Share one link.", "Let WenMee
 
 export default function HomePage() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const [copied, setCopied] = useState(false);
 
   useLayoutEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -77,16 +78,6 @@ export default function HomePage() {
     return () => ctx.revert();
   }, []);
 
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(`https://${DEMO_LINK}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      // clipboard unavailable — no-op, button label simply won't confirm
-    }
-  };
-
   return (
     <div ref={rootRef} id="main">
       <LandingNav />
@@ -106,7 +97,7 @@ export default function HomePage() {
               timezones.
             </p>
             <div data-hero-cta style={{ display: "flex", gap: "0.85rem", flexWrap: "wrap" }}>
-              <Link href={DEMO_HREF} className="cta-button cta-primary">
+              <Link href="/app/new" className="cta-button cta-primary">
                 Create a WenMeet
               </Link>
               <a href="#coordination" className="cta-button cta-secondary">
@@ -177,12 +168,14 @@ export default function HomePage() {
             </div>
           ))}
         </div>
+        {/* Illustrates the shape of a real share link. It is not a copyable
+            URL, because a live meeting's token only exists once an organizer
+            creates one — offering "Copy link" here would hand over a URL
+            that goes nowhere. */}
         <div data-reveal style={{ display: "flex", justifyContent: "center", marginTop: "1.5rem" }}>
-          <div className="link-copy">
+          <div className="link-copy link-copy-sample">
             <code>{DEMO_LINK}</code>
-            <button type="button" onClick={copyLink} className="cta-button cta-primary" style={{ padding: "0.45rem 1.1rem", fontSize: "0.85rem" }}>
-              {copied ? "Copied" : "Copy link"}
-            </button>
+            <span className="link-copy-note">Every WenMeet gets its own link</span>
           </div>
         </div>
       </section>
@@ -234,7 +227,7 @@ export default function HomePage() {
               <span key={s}>{s}</span>
             ))}
           </div>
-          <Link href={DEMO_HREF} className="cta-button cta-primary">
+          <Link href="/app/new" className="cta-button cta-primary">
             Create a WenMeet
           </Link>
           <p style={{ ...styles.sectionSub, marginTop: "1.1rem", fontSize: "0.85rem" }}>
@@ -246,7 +239,15 @@ export default function HomePage() {
       <footer style={styles.footer}>
         <div className="container" style={{ textAlign: "center" }}>
           <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", margin: 0 }}>
-            WenMeet &middot; Conscious Capital Brands
+            WenMeet &middot;{" "}
+            <a
+              href="https://conscience.fund"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-brand-link"
+            >
+              Conscious Capital Brands
+            </a>
           </p>
         </div>
       </footer>

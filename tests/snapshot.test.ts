@@ -15,6 +15,7 @@ describe("scheduling snapshot lifecycle (§7)", () => {
     const kdm1 = await store.createParticipant({ name: "Kdm", email: "kdm@ccb.dev", timezone: "UTC" });
 
     const meeting = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title: "Board sync",
       organizerId: organizer.id,
       windowStartUtc: "2026-09-01T00:00:00Z",

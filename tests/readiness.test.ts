@@ -11,6 +11,7 @@ function availability(participantId: string, status: Availability["status"]): Av
     status,
     submittedTimezone: "America/Los_Angeles",
     updatedAt: new Date().toISOString(),
+    version: 1,
   };
 }
 

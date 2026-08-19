@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
 import { getOrCreateCurrentParticipant } from "@/lib/auth/currentParticipant";
+import { generateShareToken } from "@/lib/shareToken";
 
 export async function POST(req: Request) {
   // organizerId is derived from the signed-in Clerk session, never trusted
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
   const meeting = await store.createMeeting({
     title,
     organizerId: organizer.id,
+    shareToken: generateShareToken(),
     windowStartUtc,
     windowEndUtc,
     decisionDependent: Boolean(decisionDependent),

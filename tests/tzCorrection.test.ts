@@ -13,6 +13,7 @@ describe("timezone correction after submission (§6)", () => {
   it("moves confirmed availability to needs_confirmation and blocks readiness until re-confirmed", async () => {
     const participant = await store.createParticipant({ name: "Sam", email: "sam@ccb.dev", timezone: "America/Los_Angeles" });
     const meeting = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title: "Standup",
       organizerId: participant.id,
       windowStartUtc: "2026-09-01T00:00:00Z",

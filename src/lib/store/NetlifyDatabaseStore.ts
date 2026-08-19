@@ -39,6 +39,7 @@ function mapMeeting(row: any): Meeting {
     id: row.id,
     title: row.title,
     organizerId: row.organizer_id,
+    shareToken: row.share_token,
     windowStartUtc: toIso(row.window_start_utc),
     windowEndUtc: toIso(row.window_end_utc),
     decisionDependent: row.decision_dependent,
@@ -145,6 +146,11 @@ export class NetlifyDatabaseStore implements NebulaStore {
     return rows[0] ? mapParticipant(rows[0]) : null;
   }
 
+  async getParticipantByEmail(email: string): Promise<Participant | null> {
+    const rows = await this.db.sql<any>`SELECT * FROM participants WHERE lower(email) = ${email.trim().toLowerCase()}`;
+    return rows[0] ? mapParticipant(rows[0]) : null;
+  }
+
   async updateParticipantTimezone(id: string, timezone: string): Promise<Participant> {
     const rows = await this.db.sql<any>`
       UPDATE participants SET timezone = ${timezone} WHERE id = ${id} RETURNING *
@@ -156,11 +162,11 @@ export class NetlifyDatabaseStore implements NebulaStore {
   async createMeeting(m: Omit<Meeting, "id" | "createdAt">): Promise<Meeting> {
     const rows = await this.db.sql<any>`
       INSERT INTO meetings (
-        title, organizer_id, window_start_utc, window_end_utc,
+        title, organizer_id, share_token, window_start_utc, window_end_utc,
         decision_dependent, status, proposed_slot_start_utc, proposed_slot_end_utc, current_snapshot_id
       )
       VALUES (
-        ${m.title}, ${m.organizerId}, ${m.windowStartUtc}, ${m.windowEndUtc},
+        ${m.title}, ${m.organizerId}, ${m.shareToken}, ${m.windowStartUtc}, ${m.windowEndUtc},
         ${m.decisionDependent}, ${m.status}, ${m.proposedSlot?.startUtc ?? null}, ${m.proposedSlot?.endUtc ?? null}, ${m.currentSnapshotId}
       )
       RETURNING *
@@ -170,6 +176,11 @@ export class NetlifyDatabaseStore implements NebulaStore {
 
   async getMeeting(id: string): Promise<Meeting | null> {
     const rows = await this.db.sql<any>`SELECT * FROM meetings WHERE id = ${id}`;
+    return rows[0] ? mapMeeting(rows[0]) : null;
+  }
+
+  async getMeetingByShareToken(shareToken: string): Promise<Meeting | null> {
+    const rows = await this.db.sql<any>`SELECT * FROM meetings WHERE share_token = ${shareToken}`;
     return rows[0] ? mapMeeting(rows[0]) : null;
   }
 

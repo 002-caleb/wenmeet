@@ -13,6 +13,7 @@ describe("waivers (§12)", () => {
   it("waiving a participant only affects the specific meeting, not their global role", async () => {
     const p = await store.createParticipant({ name: "Rae", email: "rae@ccb.dev", timezone: "UTC" });
     const m1 = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title: "M1",
       organizerId: p.id,
       windowStartUtc: "2026-09-01T00:00:00Z",
@@ -23,6 +24,7 @@ describe("waivers (§12)", () => {
       currentSnapshotId: null,
     });
     const m2 = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title: "M2",
       organizerId: p.id,
       windowStartUtc: "2026-09-01T00:00:00Z",
@@ -57,6 +59,7 @@ describe("waivers (§12)", () => {
   it("post-lock decline moves the meeting to needs_rescheduling", async () => {
     const p = await store.createParticipant({ name: "Org", email: "o@ccb.dev", timezone: "UTC" });
     const meeting = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title: "Locked meeting",
       organizerId: p.id,
       windowStartUtc: "2026-09-01T00:00:00Z",

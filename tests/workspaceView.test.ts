@@ -12,6 +12,7 @@ describe("loadWorkspaceView (authenticated workspace dashboard)", () => {
 
   async function makeMeetingFor(organizerId: string, title: string) {
     const meeting = await store.createMeeting({
+      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
       title,
       organizerId,
       windowStartUtc: "2026-09-01T00:00:00Z",

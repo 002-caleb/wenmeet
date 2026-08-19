@@ -126,6 +126,13 @@ export interface Meeting {
   id: string;
   title: string;
   organizerId: string;
+  /**
+   * Unguessable public handle for the participant response page (/m/:token).
+   * Separate from `id` on purpose: the id appears in organizer-only URLs and
+   * API paths, so reusing it as the shared secret would make every meeting
+   * reachable by anyone who saw an internal link.
+   */
+  shareToken: string;
   /** The window the organizer is trying to schedule within. */
   windowStartUtc: string;
   windowEndUtc: string;
