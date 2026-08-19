@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { LandingNav } from "@/components/landing/LandingNav";
 import { MeetingResolver } from "@/components/landing/MeetingResolver";
 import { ScenarioExplorer } from "@/components/landing/ScenarioExplorer";
 import { RESOLVER_SCENARIOS, ROLE_LABEL, ROLE_SYMBOL, type RoleKind } from "@/lib/landing/resolverScenarios";
@@ -89,34 +89,7 @@ export default function HomePage() {
 
   return (
     <div ref={rootRef} id="main">
-      <nav data-hero-nav style={styles.nav}>
-        <div className="container" style={styles.navInner}>
-          <span style={styles.logo}>WenMeet</span>
-          <div style={{ display: "flex", alignItems: "center", gap: "1.75rem" }}>
-            <div style={{ display: "flex", gap: "1.5rem" }}>
-              <a href="#coordination" style={styles.navLink}>Product</a>
-              <a href="#how-it-works" style={styles.navLink}>How it works</a>
-              <a href="#scenarios" style={styles.navLink}>For teams</a>
-            </div>
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button type="button" style={styles.signInLink}>Sign in</button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <button type="button" className="cta-button cta-primary" style={{ padding: "0.5rem 1.2rem", fontSize: "0.85rem" }}>
-                  Create a WenMeet
-                </button>
-              </SignUpButton>
-            </SignedOut>
-            <SignedIn>
-              <Link href="/app/new" className="cta-button cta-primary" style={{ padding: "0.5rem 1.2rem", fontSize: "0.85rem" }}>
-                Create a WenMeet
-              </Link>
-              <UserButton />
-            </SignedIn>
-          </div>
-        </div>
-      </nav>
+      <LandingNav />
 
       <header className="hero-shell" style={styles.hero}>
         <div className="hero-glow hero-glow-a" data-glow aria-hidden />
@@ -282,37 +255,6 @@ export default function HomePage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  nav: {
-    position: "sticky",
-    top: 0,
-    zIndex: 10,
-    background: "color-mix(in srgb, var(--bg) 88%, transparent)",
-    backdropFilter: "blur(10px)",
-    borderBottom: "1px solid var(--border)",
-  },
-  navInner: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingTop: "1rem",
-    paddingBottom: "1rem",
-  },
-  navLink: {
-    fontSize: "0.88rem",
-    fontWeight: 600,
-    color: "var(--text-muted)",
-    textDecoration: "none",
-  },
-  signInLink: {
-    background: "none",
-    border: "none",
-    padding: 0,
-    fontSize: "0.88rem",
-    fontWeight: 600,
-    color: "var(--text-muted)",
-    cursor: "pointer",
-  },
-  logo: { fontWeight: 800, fontSize: "1.1rem", letterSpacing: "-0.01em" },
   hero: { padding: "3.5rem 0" },
   eyebrow: {
     fontSize: "0.78rem",

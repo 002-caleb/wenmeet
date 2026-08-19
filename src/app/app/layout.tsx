@@ -19,14 +19,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div style={{ minHeight: "100dvh" }}>
       <nav style={styles.nav}>
-        <div style={styles.navInner}>
-          <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+        <div className="app-nav-inner">
+          <div className="app-nav-left">
             <Link href="/app" style={styles.logo}>WenMeet</Link>
             <AppNavLinks />
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <Link href="/app/new" className="pill-button pill-button-primary" style={{ padding: "0.5rem 1.1rem", fontSize: "0.85rem" }}>
-              + New WenMeet
+          <div className="app-nav-right">
+            {/* Label shortens on narrow screens so the nav can't overflow. */}
+            <Link href="/app/new" className="pill-button pill-button-primary app-nav-cta">
+              <span className="app-nav-cta-full">+ New WenMeet</span>
+              <span className="app-nav-cta-short">+ New</span>
             </Link>
             <UserButton />
           </div>
@@ -41,14 +43,6 @@ const styles: Record<string, React.CSSProperties> = {
   nav: {
     borderBottom: "1px solid var(--border)",
     background: "var(--surface)",
-  },
-  navInner: {
-    maxWidth: 960,
-    margin: "0 auto",
-    padding: "0.85rem 1.5rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
   },
   logo: { fontWeight: 800, fontSize: "1rem", color: "var(--text)", textDecoration: "none" },
 };

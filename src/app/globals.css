@@ -1607,3 +1607,236 @@ code {
     letter-spacing: 0.03em;
   }
 }
+
+/* ---- Marketing header + mobile drawer ----
+   Below 820px the section links move behind a toggle: five horizontal
+   items overflowed the viewport at phone widths and collided with the
+   wordmark. Panel links carry a 44px minimum touch target. */
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+/* The header is translucent by default; while the drawer is open the
+   backdrop would otherwise show through and grey it out. */
+.site-nav-open {
+  background: var(--surface);
+}
+
+.site-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.site-nav-logo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.site-nav-desktop {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.site-nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.site-nav-link,
+.site-nav-signin {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.site-nav-link:hover,
+.site-nav-signin:hover {
+  color: var(--text);
+}
+
+.site-nav-cta {
+  padding: 0.5rem 1.2rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Mobile cluster — hidden on desktop. */
+
+.site-nav-mobile {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.site-nav-signin-compact {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.5rem;
+}
+
+.site-nav-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.site-nav-toggle:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  color: var(--accent);
+}
+
+.site-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  background: color-mix(in srgb, var(--text) 28%, transparent);
+  z-index: 15;
+}
+
+.site-nav-panel {
+  display: none;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  position: relative;
+  z-index: 21;
+}
+
+.site-nav-panel-inner {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.5rem;
+  padding-bottom: 1rem;
+}
+
+.site-nav-panel-link {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-nav-panel-cta {
+  width: 100%;
+  justify-content: center;
+  margin-top: 1rem;
+  min-height: 48px;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 819px) {
+  .site-nav-desktop {
+    display: none;
+  }
+  .site-nav-mobile {
+    display: flex;
+  }
+  .site-nav-panel-open {
+    display: block;
+    animation: site-nav-drop 0.18s ease-out;
+  }
+}
+
+@keyframes site-nav-drop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav-panel-open {
+    animation: none;
+  }
+}
+
+/* ---- App shell nav responsiveness ----
+   Same crowding failure as the marketing header: logo + two links + a
+   full-length CTA + avatar exceeded the viewport on a phone. The link
+   set is short enough to keep inline, so the CTA label shortens instead
+   of hiding behind a toggle. */
+
+.app-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.app-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  min-width: 0;
+}
+
+.app-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.app-nav-cta {
+  padding: 0.5rem 1.1rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.app-nav-cta-short {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .app-nav-inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .app-nav-left {
+    gap: 1rem;
+  }
+  .app-nav-right {
+    gap: 0.6rem;
+  }
+  .app-nav-cta {
+    padding: 0.5rem 0.85rem;
+  }
+  .app-nav-cta-full {
+    display: none;
+  }
+  .app-nav-cta-short {
+    display: inline;
+  }
+}
