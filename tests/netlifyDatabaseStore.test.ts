@@ -1,6 +1,7 @@
 import { NetlifyDB } from "@netlify/database-dev";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { NetlifyDatabaseStore } from "../src/lib/store/NetlifyDatabaseStore";
+import { meetingInput } from "./helpers/meetingInput";
 
 // Real, ephemeral Postgres running the actual migrations — this is the
 // only way to be confident the raw-SQL store is correct rather than
@@ -48,8 +49,8 @@ describe("NetlifyDatabaseStore", () => {
     const organizer = await store.createParticipant({ name: "Org", email: "org@example.com", timezone: "UTC" });
     const required = await store.createParticipant({ name: "Req", email: "req@example.com", timezone: "UTC" });
 
-    const meeting = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+    const meeting = await store.createMeeting(
+      meetingInput({
       title: "Strategy Call",
       organizerId: organizer.id,
       windowStartUtc: "2026-08-18T00:00:00.000Z",
@@ -58,7 +59,8 @@ describe("NetlifyDatabaseStore", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
     expect(meeting.id).toBeTruthy();
     expect(meeting.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
 
@@ -86,8 +88,8 @@ describe("NetlifyDatabaseStore", () => {
 
   test("upserts availability and increments version on resubmission", async () => {
     const organizer = await store.createParticipant({ name: "O2", email: "o2@example.com", timezone: "UTC" });
-    const meeting = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+    const meeting = await store.createMeeting(
+      meetingInput({
       title: "Sync",
       organizerId: organizer.id,
       windowStartUtc: "2026-08-18T00:00:00.000Z",
@@ -96,7 +98,8 @@ describe("NetlifyDatabaseStore", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
 
     const first = await store.upsertAvailability({
       meetingId: meeting.id,
@@ -128,8 +131,8 @@ describe("NetlifyDatabaseStore", () => {
   test("waives a participant idempotently", async () => {
     const organizer = await store.createParticipant({ name: "O3", email: "o3@example.com", timezone: "UTC" });
     const participant = await store.createParticipant({ name: "P3", email: "p3@example.com", timezone: "UTC" });
-    const meeting = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+    const meeting = await store.createMeeting(
+      meetingInput({
       title: "Waiver test",
       organizerId: organizer.id,
       windowStartUtc: "2026-08-18T00:00:00.000Z",
@@ -138,7 +141,8 @@ describe("NetlifyDatabaseStore", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
 
     await store.waiveParticipant({
       meetingId: meeting.id,
@@ -155,8 +159,8 @@ describe("NetlifyDatabaseStore", () => {
 
   test("creates and updates a scheduling snapshot, preserving jsonb and uuid[] round-trip", async () => {
     const organizer = await store.createParticipant({ name: "O4", email: "o4@example.com", timezone: "UTC" });
-    const meeting = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+    const meeting = await store.createMeeting(
+      meetingInput({
       title: "Snapshot test",
       organizerId: organizer.id,
       windowStartUtc: "2026-08-18T00:00:00.000Z",
@@ -165,7 +169,8 @@ describe("NetlifyDatabaseStore", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
 
     const snapshot = await store.createSnapshot({
       meetingId: meeting.id,

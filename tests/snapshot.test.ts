@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { InMemoryStore } from "../src/lib/store/InMemoryStore";
 import { runSchedulingSnapshot, revalidateBeforeLock, RETRY_SOFT_CAP } from "../src/lib/scheduling/snapshot";
+import { meetingInput } from "./helpers/meetingInput";
 
 describe("scheduling snapshot lifecycle (§7)", () => {
   let store: InMemoryStore;
@@ -14,8 +15,8 @@ describe("scheduling snapshot lifecycle (§7)", () => {
     const req1 = await store.createParticipant({ name: "Req", email: "req@ccb.dev", timezone: "UTC" });
     const kdm1 = await store.createParticipant({ name: "Kdm", email: "kdm@ccb.dev", timezone: "UTC" });
 
-    const meeting = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+    const meeting = await store.createMeeting(
+      meetingInput({
       title: "Board sync",
       organizerId: organizer.id,
       windowStartUtc: "2026-09-01T00:00:00Z",
@@ -24,7 +25,8 @@ describe("scheduling snapshot lifecycle (§7)", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
 
     await store.assignRole({ participantId: organizer.id, meetingId: meeting.id, role: "organizer" });
     await store.assignRole({ participantId: req1.id, meetingId: meeting.id, role: "required" });

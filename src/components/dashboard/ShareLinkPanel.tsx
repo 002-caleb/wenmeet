@@ -6,8 +6,18 @@ import { useState } from "react";
  * The organizer's copy of the real participant link. The URL is built from
  * the live origin rather than a hardcoded domain, so it stays correct on
  * localhost, a deploy preview, and production alike.
+ *
+ * `justCreated` promotes it right after the wizard finishes — a new meeting
+ * does nothing until the link reaches people, so that is the one moment it
+ * deserves to be the loudest thing on the page.
  */
-export function ShareLinkPanel({ shareToken }: { shareToken: string }) {
+export function ShareLinkPanel({
+  shareToken,
+  justCreated = false,
+}: {
+  shareToken: string;
+  justCreated?: boolean;
+}) {
   const [copied, setCopied] = useState(false);
   const path = `/m/${shareToken}`;
   const display = typeof window === "undefined" ? path : `${window.location.host}${path}`;
@@ -27,11 +37,13 @@ export function ShareLinkPanel({ shareToken }: { shareToken: string }) {
   return (
     <section aria-labelledby="share-link-label" style={{ marginBottom: "1.5rem" }}>
       <h2 id="share-link-label" className="ws-section-label">
-        Share this WenMeet
+        {justCreated ? "Your WenMeet is ready" : "Share this WenMeet"}
       </h2>
-      <div className="ws-panel share-panel">
+      <div className={`ws-panel share-panel${justCreated ? " share-panel-fresh" : ""}`}>
         <p className="ws-muted-line" style={{ marginBottom: "0.75rem" }}>
-          Send this link to anyone who should respond. They don&rsquo;t need an account.
+          {justCreated
+            ? "Send this link to everyone who should respond. They don't need an account."
+            : "Send this link to anyone who should respond. They don't need an account."}
         </p>
         <div className="share-link-row">
           <code className="share-link-url">{display}</code>

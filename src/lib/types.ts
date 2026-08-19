@@ -6,7 +6,16 @@
 //   §7  Scheduling readiness, T-24h lock, versioned snapshot scheduling
 //   §12 Rescheduling, waiver states, live availability grid
 
+import type { SchedulingConstraints, SchedulingPolicy } from "./scheduling/policy";
+
 export type Role = "organizer" | "required" | "kdm" | "optional";
+
+/**
+ * Roles an organizer can hand out. "organizer" is excluded deliberately: it
+ * is derived from who created the meeting, never chosen, so any UI or API
+ * that accepts a role from a caller should use this type instead of `Role`.
+ */
+export type AssignableRole = Exclude<Role, "organizer">;
 
 export interface Participant {
   id: string;
@@ -91,6 +100,29 @@ export interface Waiver {
   waivedReason: string;
 }
 
+/**
+ * How a meeting happens. "undecided" is a real, choosable answer — an
+ * organizer often knows who and when before knowing where, and forcing the
+ * choice early would just produce wrong data.
+ */
+export type MeetingLocationKind =
+  | "google_meet"
+  | "teams"
+  | "custom_link"
+  | "phone"
+  | "in_person"
+  | "undecided";
+
+export interface MeetingLocation {
+  kind: MeetingLocationKind;
+  /**
+   * The URL, number, or address, depending on `kind`. Null for the kinds
+   * that need no detail (google_meet, teams, undecided) — note that WenMeet
+   * does not yet generate Meet/Teams links itself; it records the intent.
+   */
+  detail: string | null;
+}
+
 export type MeetingStatus =
   | "collecting" // gathering availability, not yet ready
   | "ready" // required+kdm all answered, no valid slot search run yet / in progress
@@ -133,9 +165,23 @@ export interface Meeting {
    * reachable by anyone who saw an internal link.
    */
   shareToken: string;
-  /** The window the organizer is trying to schedule within. */
+  /** How long the meeting runs. Drives the slot length the engine proposes. */
+  durationMinutes: number;
+  /**
+   * The search space: range paradigm plus the rules and exceptions applied on
+   * top of it. `windowStartUtc`/`windowEndUtc` are the resolved bounds derived
+   * from this — kept because the engine and every existing query use them, but
+   * the policy is the source of truth.
+   */
+  schedulingPolicy: SchedulingPolicy;
+  schedulingConstraints: SchedulingConstraints;
+  /** Resolved bounds of the policy. Derived, not authored. */
   windowStartUtc: string;
   windowEndUtc: string;
+  /** How the meeting happens. Null only for meetings created before this existed. */
+  location: MeetingLocation | null;
+  /** When participants should reply by. Advisory — nothing enforces it yet. */
+  responseDeadlineUtc: string | null;
   decisionDependent: boolean;
   status: MeetingStatus;
   /** Set once a scheduling run proposes a time; drives the T-24h lock. */

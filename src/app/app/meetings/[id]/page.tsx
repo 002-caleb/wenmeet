@@ -11,15 +11,23 @@ import { ShareLinkPanel } from "@/components/dashboard/ShareLinkPanel";
 
 /**
  * Organizer meeting detail — where the dashboard's attention and active
- * rows lead. It consumes the same `buildMeetingSummary` contract as the
- * workspace home, so lifecycle and attention can't drift between the two
- * surfaces (§52).
+ * rows lead, and where the wizard lands after creating. It consumes the same
+ * `buildMeetingSummary` contract as the workspace home, so lifecycle and
+ * attention can't drift between the two surfaces.
  *
- * Read-only: with no invite flow yet, most meetings have only the
- * organizer, and this page says so plainly rather than implying a roster.
+ * Arriving with ?created=1 puts the share link first: a freshly created
+ * meeting is useless until it reaches people.
  */
-export default async function MeetingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function MeetingDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ created?: string }>;
+}) {
   const { id } = await params;
+  const { created } = await searchParams;
+  const justCreated = created === "1";
   const organizer = await getOrCreateCurrentParticipant();
   if (!organizer) notFound();
 
@@ -81,7 +89,9 @@ export default async function MeetingDetailPage({ params }: { params: Promise<{ 
         </div>
       )}
 
-      {meeting.status !== "locked" && <ShareLinkPanel shareToken={meeting.shareToken} />}
+      {meeting.status !== "locked" && (
+        <ShareLinkPanel shareToken={meeting.shareToken} justCreated={justCreated} />
+      )}
 
       <section aria-labelledby="md-participants">
         <h2 id="md-participants" className="ws-section-label">

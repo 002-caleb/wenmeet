@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { InMemoryStore } from "../src/lib/store/InMemoryStore";
 import { runSchedulingSnapshot } from "../src/lib/scheduling/snapshot";
 import { loadWorkspaceView, placeSummary, type MeetingSummary } from "../src/lib/dashboard/workspaceView";
+import { meetingInput } from "./helpers/meetingInput";
 
 describe("loadWorkspaceView (authenticated workspace dashboard)", () => {
   let store: InMemoryStore;
@@ -11,8 +12,8 @@ describe("loadWorkspaceView (authenticated workspace dashboard)", () => {
   });
 
   async function makeMeetingFor(organizerId: string, title: string) {
-    const meeting = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+    const meeting = await store.createMeeting(
+      meetingInput({
       title,
       organizerId,
       windowStartUtc: "2026-09-01T00:00:00Z",
@@ -21,7 +22,8 @@ describe("loadWorkspaceView (authenticated workspace dashboard)", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
     await store.assignRole({ participantId: organizerId, meetingId: meeting.id, role: "organizer" });
     return meeting;
   }

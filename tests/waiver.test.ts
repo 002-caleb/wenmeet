@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { InMemoryStore } from "../src/lib/store/InMemoryStore";
 import { waiveParticipant, handlePostLockDecline } from "../src/lib/scheduling/waiver";
 import { computeReadiness } from "../src/lib/scheduling/readiness";
+import { meetingInput } from "./helpers/meetingInput";
 
 describe("waivers (§12)", () => {
   let store: InMemoryStore;
@@ -12,8 +13,8 @@ describe("waivers (§12)", () => {
 
   it("waiving a participant only affects the specific meeting, not their global role", async () => {
     const p = await store.createParticipant({ name: "Rae", email: "rae@ccb.dev", timezone: "UTC" });
-    const m1 = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+    const m1 = await store.createMeeting(
+      meetingInput({
       title: "M1",
       organizerId: p.id,
       windowStartUtc: "2026-09-01T00:00:00Z",
@@ -22,9 +23,10 @@ describe("waivers (§12)", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
-    const m2 = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+      }),
+    );
+    const m2 = await store.createMeeting(
+      meetingInput({
       title: "M2",
       organizerId: p.id,
       windowStartUtc: "2026-09-01T00:00:00Z",
@@ -33,7 +35,8 @@ describe("waivers (§12)", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
     await store.assignRole({ participantId: p.id, meetingId: m1.id, role: "required" });
     await store.assignRole({ participantId: p.id, meetingId: m2.id, role: "required" });
 
@@ -58,8 +61,8 @@ describe("waivers (§12)", () => {
 
   it("post-lock decline moves the meeting to needs_rescheduling", async () => {
     const p = await store.createParticipant({ name: "Org", email: "o@ccb.dev", timezone: "UTC" });
-    const meeting = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+    const meeting = await store.createMeeting(
+      meetingInput({
       title: "Locked meeting",
       organizerId: p.id,
       windowStartUtc: "2026-09-01T00:00:00Z",
@@ -68,7 +71,8 @@ describe("waivers (§12)", () => {
       status: "locked",
       proposedSlot: { startUtc: "2026-09-01T17:00:00Z", endUtc: "2026-09-01T18:00:00Z" },
       currentSnapshotId: null,
-    });
+      }),
+    );
 
     const updated = await handlePostLockDecline(store, meeting.id);
     expect(updated.status).toBe("needs_rescheduling");

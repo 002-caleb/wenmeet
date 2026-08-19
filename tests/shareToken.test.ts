@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { InMemoryStore } from "../src/lib/store/InMemoryStore";
 import { generateShareToken, isValidShareTokenShape } from "../src/lib/shareToken";
+import { meetingInput } from "./helpers/meetingInput";
 
 describe("share tokens", () => {
   it("generates tokens of the expected shape", () => {
@@ -40,7 +41,8 @@ describe("resolving a meeting by its share link", () => {
       timezone: "UTC",
     });
     const shareToken = generateShareToken();
-    const meeting = await store.createMeeting({
+    const meeting = await store.createMeeting(
+      meetingInput({
       title: "Board Strategy Call",
       organizerId: organizer.id,
       shareToken,
@@ -50,7 +52,8 @@ describe("resolving a meeting by its share link", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
     return { store, organizer, meeting, shareToken };
   }
 

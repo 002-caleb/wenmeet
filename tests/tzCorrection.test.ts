@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { InMemoryStore } from "../src/lib/store/InMemoryStore";
 import { handleParticipantTimezoneChange, confirmAvailability } from "../src/lib/timezone/tzCorrection";
 import { computeReadiness } from "../src/lib/scheduling/readiness";
+import { meetingInput } from "./helpers/meetingInput";
 
 describe("timezone correction after submission (§6)", () => {
   let store: InMemoryStore;
@@ -12,8 +13,8 @@ describe("timezone correction after submission (§6)", () => {
 
   it("moves confirmed availability to needs_confirmation and blocks readiness until re-confirmed", async () => {
     const participant = await store.createParticipant({ name: "Sam", email: "sam@ccb.dev", timezone: "America/Los_Angeles" });
-    const meeting = await store.createMeeting({
-      shareToken: `tok-${Math.random().toString(36).slice(2, 10)}`,
+    const meeting = await store.createMeeting(
+      meetingInput({
       title: "Standup",
       organizerId: participant.id,
       windowStartUtc: "2026-09-01T00:00:00Z",
@@ -22,7 +23,8 @@ describe("timezone correction after submission (§6)", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
     await store.assignRole({ participantId: participant.id, meetingId: meeting.id, role: "required" });
     await store.upsertAvailability({
       meetingId: meeting.id,

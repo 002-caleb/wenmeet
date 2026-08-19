@@ -3,6 +3,7 @@ import { POST } from "../src/app/api/m/[token]/respond/route";
 import { getStore } from "../src/lib/store";
 import { generateShareToken } from "../src/lib/shareToken";
 import type { Meeting, Participant } from "../src/lib/types";
+import { meetingInput } from "./helpers/meetingInput";
 
 /**
  * The respond endpoint is deliberately unauthenticated — the share token is
@@ -38,7 +39,8 @@ describe("POST /api/m/:token/respond", () => {
       timezone: "UTC",
     });
     token = generateShareToken();
-    meeting = await store.createMeeting({
+    meeting = await store.createMeeting(
+      meetingInput({
       title: "Board Strategy Call",
       organizerId: organizer.id,
       shareToken: token,
@@ -48,7 +50,8 @@ describe("POST /api/m/:token/respond", () => {
       status: "collecting",
       proposedSlot: null,
       currentSnapshotId: null,
-    });
+      }),
+    );
   });
 
   const validBody = (over: Record<string, unknown> = {}) => ({

@@ -9,6 +9,7 @@ import type {
   Waiver,
 } from "../types";
 import type { NebulaStore } from "./NebulaStore";
+import { DEFAULT_ACTIVE_WEEKDAYS, type SchedulingPolicy } from "../scheduling/policy";
 
 // Row shapes are intentionally untyped (`any`) at the query boundary —
 // the map* functions below are the single place that translates Postgres's
@@ -34,12 +35,42 @@ function mapParticipant(row: any): Participant {
   };
 }
 
+/** Rebuilds the discriminated policy union from its explicit columns. */
+function mapPolicy(row: any): SchedulingPolicy {
+  if (row.range_type === "rolling") {
+    return { type: "rolling", amount: row.range_amount ?? 14, unit: row.range_unit ?? "days" };
+  }
+  if (row.range_type === "specific") {
+    return { type: "specific", dates: parseJsonb(row.specific_dates ?? []) };
+  }
+  return {
+    type: "fixed",
+    startDate: toDateKey(row.range_start_date),
+    endDate: toDateKey(row.range_end_date),
+  };
+}
+
+/** A DATE column arrives as a Date or a string; both must become YYYY-MM-DD. */
+function toDateKey(value: string | Date | null): string {
+  if (!value) return "";
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return String(value).slice(0, 10);
+}
+
 function mapMeeting(row: any): Meeting {
   return {
     id: row.id,
     title: row.title,
     organizerId: row.organizer_id,
     shareToken: row.share_token,
+    durationMinutes: row.duration_minutes,
+    schedulingPolicy: mapPolicy(row),
+    schedulingConstraints: {
+      timezone: row.scheduling_timezone ?? "UTC",
+      activeWeekdays: row.active_weekdays ?? DEFAULT_ACTIVE_WEEKDAYS,
+      blackoutRanges: parseJsonb(row.blackout_ranges ?? []),
+      minimumNoticeMinutes: row.minimum_notice_minutes ?? 0,
+    },
     windowStartUtc: toIso(row.window_start_utc),
     windowEndUtc: toIso(row.window_end_utc),
     decisionDependent: row.decision_dependent,
@@ -48,6 +79,8 @@ function mapMeeting(row: any): Meeting {
       row.proposed_slot_start_utc && row.proposed_slot_end_utc
         ? { startUtc: toIso(row.proposed_slot_start_utc), endUtc: toIso(row.proposed_slot_end_utc) }
         : null,
+    location: row.location_kind ? { kind: row.location_kind, detail: row.location_detail ?? null } : null,
+    responseDeadlineUtc: row.response_deadline_utc ? toIso(row.response_deadline_utc) : null,
     currentSnapshotId: row.current_snapshot_id ?? null,
     createdAt: toIso(row.created_at),
   };
@@ -162,11 +195,25 @@ export class NetlifyDatabaseStore implements NebulaStore {
   async createMeeting(m: Omit<Meeting, "id" | "createdAt">): Promise<Meeting> {
     const rows = await this.db.sql<any>`
       INSERT INTO meetings (
-        title, organizer_id, share_token, window_start_utc, window_end_utc,
+        title, organizer_id, share_token, duration_minutes, window_start_utc, window_end_utc,
+        range_type, range_amount, range_unit, range_start_date, range_end_date,
+        scheduling_timezone, active_weekdays, minimum_notice_minutes, specific_dates, blackout_ranges,
+        location_kind, location_detail, response_deadline_utc,
         decision_dependent, status, proposed_slot_start_utc, proposed_slot_end_utc, current_snapshot_id
       )
       VALUES (
-        ${m.title}, ${m.organizerId}, ${m.shareToken}, ${m.windowStartUtc}, ${m.windowEndUtc},
+        ${m.title}, ${m.organizerId}, ${m.shareToken}, ${m.durationMinutes}, ${m.windowStartUtc}, ${m.windowEndUtc},
+        ${m.schedulingPolicy.type},
+        ${m.schedulingPolicy.type === "rolling" ? m.schedulingPolicy.amount : null},
+        ${m.schedulingPolicy.type === "rolling" ? m.schedulingPolicy.unit : null},
+        ${m.schedulingPolicy.type === "fixed" ? m.schedulingPolicy.startDate : null},
+        ${m.schedulingPolicy.type === "fixed" ? m.schedulingPolicy.endDate : null},
+        ${m.schedulingConstraints.timezone},
+        ${m.schedulingConstraints.activeWeekdays},
+        ${m.schedulingConstraints.minimumNoticeMinutes},
+        ${JSON.stringify(m.schedulingPolicy.type === "specific" ? m.schedulingPolicy.dates : [])},
+        ${JSON.stringify(m.schedulingConstraints.blackoutRanges)},
+        ${m.location?.kind ?? null}, ${m.location?.detail ?? null}, ${m.responseDeadlineUtc ?? null},
         ${m.decisionDependent}, ${m.status}, ${m.proposedSlot?.startUtc ?? null}, ${m.proposedSlot?.endUtc ?? null}, ${m.currentSnapshotId}
       )
       RETURNING *
@@ -192,8 +239,22 @@ export class NetlifyDatabaseStore implements NebulaStore {
       UPDATE meetings SET
         title = ${merged.title},
         organizer_id = ${merged.organizerId},
+        duration_minutes = ${merged.durationMinutes},
+        range_type = ${merged.schedulingPolicy.type},
+        range_amount = ${merged.schedulingPolicy.type === "rolling" ? merged.schedulingPolicy.amount : null},
+        range_unit = ${merged.schedulingPolicy.type === "rolling" ? merged.schedulingPolicy.unit : null},
+        range_start_date = ${merged.schedulingPolicy.type === "fixed" ? merged.schedulingPolicy.startDate : null},
+        range_end_date = ${merged.schedulingPolicy.type === "fixed" ? merged.schedulingPolicy.endDate : null},
+        scheduling_timezone = ${merged.schedulingConstraints.timezone},
+        active_weekdays = ${merged.schedulingConstraints.activeWeekdays},
+        minimum_notice_minutes = ${merged.schedulingConstraints.minimumNoticeMinutes},
+        specific_dates = ${JSON.stringify(merged.schedulingPolicy.type === "specific" ? merged.schedulingPolicy.dates : [])},
+        blackout_ranges = ${JSON.stringify(merged.schedulingConstraints.blackoutRanges)},
         window_start_utc = ${merged.windowStartUtc},
         window_end_utc = ${merged.windowEndUtc},
+        location_kind = ${merged.location?.kind ?? null},
+        location_detail = ${merged.location?.detail ?? null},
+        response_deadline_utc = ${merged.responseDeadlineUtc ?? null},
         decision_dependent = ${merged.decisionDependent},
         status = ${merged.status},
         proposed_slot_start_utc = ${merged.proposedSlot?.startUtc ?? null},
