@@ -34,7 +34,7 @@ const LOCATION_OPTIONS: Array<{ kind: MeetingLocationKind; label: string; hint?:
 
 const ROLE_OPTIONS: Array<{ role: AssignableRole; blurb: string }> = [
   { role: "required", blurb: "The meeting can't happen without them." },
-  { role: "kdm", blurb: "Needed to make or approve the decision." },
+  { role: "kdm", blurb: "This meeting can't become Ready unless they respond and can attend, unless you waive them." },
   { role: "optional", blurb: "Helpful, but never blocks the meeting." },
 ];
 
@@ -514,6 +514,16 @@ export function CreateWizard({ initialTimezone, connectedProviders }: CreateWiza
                 )}
                 {draft.invites.filter((i) => i.email.trim()).length === 0 && (
                   <span className="wiz-help">Just you — share the link to add people.</span>
+                )}
+                {/* §31: no warning when there's no KDM — it's an optional
+                    concept, not a universal requirement. Only shown when
+                    the organizer actually assigned one. */}
+                {counts.decision > 0 && (
+                  <span className="wiz-help" style={{ flexBasis: "100%" }}>
+                    This WenMeet has {counts.decision} key decision maker{counts.decision === 1 ? "" : "s"}.{" "}
+                    {counts.decision === 1 ? "They" : "All of them"} must respond before WenMeet can recommend a
+                    final time.
+                  </span>
                 )}
               </ReviewBlock>
 

@@ -3,11 +3,12 @@ import { notFound } from "next/navigation";
 import { getOrCreateCurrentParticipant } from "@/lib/auth/currentParticipant";
 import { getStore } from "@/lib/store";
 import { buildMeetingSummary } from "@/lib/dashboard/workspaceView";
+import { computeReadinessDetail } from "@/lib/scheduling/readinessDetail";
 import { describeAttention, describeLifecycle } from "@/lib/copy/statusCopy";
 import { formatDateRangeLabel } from "@/lib/copy/dateLabels";
 import { formatInTimezone } from "@/lib/timezone/tzConvert";
-import { RoleProgress } from "@/components/dashboard/RoleProgress";
 import { ShareLinkPanel } from "@/components/dashboard/ShareLinkPanel";
+import { ReadinessPanel } from "@/components/dashboard/ReadinessPanel";
 
 /**
  * Organizer meeting detail — where the dashboard's attention and active
@@ -35,24 +36,18 @@ export default async function MeetingDetailPage({
   const meeting = await store.getMeeting(id);
   if (!meeting || meeting.organizerId !== organizer.id) notFound();
 
-  const summary = await buildMeetingSummary(store, meeting);
+  const [summary, readiness] = await Promise.all([
+    buildMeetingSummary(store, meeting),
+    computeReadinessDetail(store, meeting.id),
+  ]);
 
-  // Who has actually replied — resolved from availability rows, so a name
-  // only appears once that person genuinely submitted times.
-  const availability = await store.getAvailabilityForMeeting(meeting.id);
-  const respondents = (
-    await Promise.all(
-      availability
-        .filter((a) => a.participantId !== meeting.organizerId)
-        .map((a) => store.getParticipant(a.participantId)),
-    )
-  ).filter((p): p is NonNullable<typeof p> => p !== null);
   const attention = summary.attentionReason ? describeAttention(summary.attentionReason) : null;
   const time = summary.scheduledTimeUtc ?? summary.recommendedTimeUtc;
   const timezone = organizer.timezone;
+  const hasGatingParticipants = readiness.gatingTotal + readiness.kdm.length + readiness.required.length > 0;
 
   return (
-    <div className="ws" style={{ maxWidth: 620 }}>
+    <div className="ws" style={{ maxWidth: 640 }}>
       <Link href="/app/meetings" className="ws-meta-text" style={{ textDecoration: "none" }}>
         &larr; Meetings
       </Link>
@@ -93,29 +88,20 @@ export default async function MeetingDetailPage({
         <ShareLinkPanel shareToken={meeting.shareToken} justCreated={justCreated} />
       )}
 
-      <section aria-labelledby="md-participants">
+      <section aria-labelledby="md-participants" style={{ marginTop: "0.5rem" }}>
         <h2 id="md-participants" className="ws-section-label">
           Participants
         </h2>
-        <div className="ws-panel ws-calendar-panel">
-          {summary.participantCount > 0 ? (
-            <>
-              <RoleProgress progress={summary.roleProgress} />
-              <p className="ws-muted-line" style={{ marginTop: "0.7rem" }}>
-                {summary.responseCount} of {summary.participantCount} responded.
-              </p>
-              <ul className="respondent-list">
-                {respondents.map((r) => (
-                  <li key={r.id}>
-                    <span aria-hidden className="respondent-check">&#10003;</span>
-                    {r.name}
-                  </li>
-                ))}
-              </ul>
-            </>
+        <div className="ws-panel readiness-panel-shell">
+          {hasGatingParticipants || readiness.optional.length > 0 ? (
+            <ReadinessPanel
+              meetingId={meeting.id}
+              detail={readiness}
+              canRecalculate={meeting.status !== "locked"}
+            />
           ) : (
             <p className="ws-muted-line">
-              No responses yet. Share the link above and they&rsquo;ll show up here as people reply.
+              Just you so far &mdash; share the link above and roles will appear here as people respond.
             </p>
           )}
         </div>

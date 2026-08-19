@@ -25,6 +25,8 @@ export function ShareLinkPanel({
   async function copy() {
     try {
       await navigator.clipboard.writeText(`${window.location.origin}${path}`);
+      localStorage.setItem("wenmeet:shared-invite", "complete");
+      window.dispatchEvent(new Event("wenmeet:progress"));
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {

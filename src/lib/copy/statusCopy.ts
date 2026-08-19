@@ -1,5 +1,6 @@
 import type { AvailabilityStatus, MeetingStatus, Role } from "@/lib/types";
 import type { AttentionReason, MeetingLifecycle } from "@/lib/dashboard/workspaceView";
+import type { GatingState } from "@/lib/scheduling/readinessDetail";
 
 /**
  * docs/FRONTEND_PRODUCT_SYSTEM.md §5: raw application state must pass
@@ -86,6 +87,64 @@ export interface AttentionCopy {
   /** The single next thing to do. */
   action: string;
   tone: "ready" | "blocked";
+}
+
+/**
+ * Roster row translation (§29). Lives here, not in the component, for the
+ * same reason describeAvailabilityStatus does: the internal enum value
+ * needs_confirmation must never appear as literal source text in a
+ * customer-facing file (src/app, src/components) — the copy-lint enforces
+ * this repo-wide, and src/lib/copy is its documented exemption boundary.
+ */
+export function describeGatingState(state: GatingState): { label: string; icon: string } {
+  switch (state) {
+    case "confirmed":
+    case "submitted":
+      return { label: "Available", icon: "✓" };
+    case "needs_confirmation":
+      return { label: "Confirm timezone", icon: "!" };
+    case "waiting":
+      return { label: "Waiting", icon: "○" };
+  }
+}
+
+/**
+ * §37: response freshness, always shown rather than left to a raw
+ * timestamp. §40: precise language throughout — never "almost ready" or
+ * "mostly available".
+ */
+export function describeFreshness(updatedAtIso: string, now: Date = new Date()): string {
+  const updated = new Date(updatedAtIso);
+  const startOfUpdated = new Date(updated.getFullYear(), updated.getMonth(), updated.getDate());
+  const startOfNow = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dayDiff = Math.round((startOfNow.getTime() - startOfUpdated.getTime()) / 86400000);
+
+  if (dayDiff <= 0) return "Updated today";
+  if (dayDiff === 1) return "Updated yesterday";
+  if (dayDiff <= 6) return `Updated ${dayDiff} days ago`;
+  return `Updated ${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(updated)}`;
+}
+
+export interface KdmSummary {
+  kdmReady: number;
+  kdmTotal: number;
+  requiredReady: number;
+  requiredTotal: number;
+}
+
+/** §40: the exact phrasing this product commits to — no softened substitutes. */
+export function describeKdmReadiness({ kdmReady, kdmTotal, requiredReady, requiredTotal }: KdmSummary): string {
+  if (kdmTotal === 0) {
+    return requiredReady === requiredTotal ? "All required attendees can attend" : `Waiting on ${requiredTotal - requiredReady} required`;
+  }
+  if (kdmReady < kdmTotal) {
+    const waiting = kdmTotal - kdmReady;
+    return `Waiting on ${waiting} KDM${waiting === 1 ? "" : "s"}`;
+  }
+  if (requiredReady < requiredTotal) {
+    return "All KDMs responded";
+  }
+  return kdmTotal === 1 ? "The key decision maker can attend" : "All key decision makers can attend";
 }
 
 export function describeAttention(reason: AttentionReason): AttentionCopy {

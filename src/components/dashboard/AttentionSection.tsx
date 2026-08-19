@@ -3,6 +3,7 @@ import { describeAttention } from "@/lib/copy/statusCopy";
 import { formatInTimezone } from "@/lib/timezone/tzConvert";
 import type { MeetingSummary } from "@/lib/dashboard/workspaceView";
 import { RoleProgress, roleProgressSentence } from "./RoleProgress";
+import { ReadinessRing } from "./ReadinessRing";
 
 interface AttentionSectionProps {
   items: MeetingSummary[];
@@ -70,6 +71,15 @@ function AttentionCard({ item, timezone }: { item: MeetingSummary; timezone: str
       <p className="ws-muted-line">{copy.detail}</p>
 
       <div className="ws-attention-meta">
+        {item.roleProgress.decision.total > 0 && (
+          <ReadinessRing
+            size="compact"
+            kdmReady={item.roleProgress.decision.ready}
+            kdmTotal={item.roleProgress.decision.total}
+            requiredReady={item.roleProgress.required.ready}
+            requiredTotal={item.roleProgress.required.total}
+          />
+        )}
         <RoleProgress progress={item.roleProgress} />
         {item.participantCount > 0 && (
           <span className="ws-meta-text">

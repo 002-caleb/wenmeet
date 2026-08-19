@@ -167,9 +167,21 @@ If any landing-page section makes this harder to understand, remove or simplify 
 
 ## 7. Product Vocabulary
 
-**Preferred:** Create a WenMeet, When can you meet?, Choose your times, Share, People, Required, Optional, Decision maker, Best times, Book, Calendars, Meeting location, Ready, Waiting.
+**Preferred:** Create a WenMeet, When can you meet?, Choose your times, Share, People, Required, Optional, Decision maker, KDM, Best times, Book, Calendars, Meeting location, Ready, Waiting.
 
-**Avoid:** Submit availability, Scheduling readiness, Hard constraint, Soft constraint, KDM, Constraint evaluation, Snapshot, Candidate score, Normalized interval, Availability state, Provider synchronization.
+**Avoid:** Submit availability, Scheduling readiness, Hard constraint, Soft constraint, Constraint evaluation, Snapshot, Candidate score, Normalized interval, Availability state, Provider synchronization.
+
+**Amendment (`docs/KDM_AVAILABILITY_ADDENDUM.md`):** "KDM" moved from
+*Avoid* to *Preferred*. The original reasoning still holds for every
+other term on the *Avoid* list — those are implementation vocabulary
+with no product meaning to a user. KDM is different: the addendum makes
+it a deliberate, spelled-out product concept ("Key decision maker") with
+its own visible states, its own ring segment, its own copy ("Waiting on
+1 KDM", "All KDMs responded") — at that point hiding the abbreviation
+would just be inconsistent with "Decision maker," not more human. Spell
+out "Key decision maker" on first reference in a given surface; "KDM" is
+fine once that context is established (exactly how the addendum's own
+copy examples use it).
 
 Internal terminology may exist in code. Public terminology must remain human.
 

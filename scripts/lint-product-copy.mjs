@@ -37,7 +37,9 @@ const BLOCKED_PATTERNS = [
   "participant_roles",
   "calendar_busy_intervals",
   "webhook",
-  " KDM",
+  // "KDM" was here until docs/KDM_AVAILABILITY_ADDENDUM.md made it a real,
+  // spelled-out product concept (see docs/FRONTEND_PRODUCT_SYSTEM.md §7's
+  // amendment) — it now belongs in customer-facing copy, not this list.
   "hard constraint",
   "soft constraint",
   "evaluated deterministically",

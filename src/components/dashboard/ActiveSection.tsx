@@ -3,6 +3,7 @@ import { describeLifecycle } from "@/lib/copy/statusCopy";
 import { formatDateRangeLabel } from "@/lib/copy/dateLabels";
 import type { MeetingSummary } from "@/lib/dashboard/workspaceView";
 import { RoleProgress, roleProgressSentence } from "./RoleProgress";
+import { ReadinessRing } from "./ReadinessRing";
 
 /**
  * §16-19. Rows, not cards — Active carries no panel surface of its own, so
@@ -75,7 +76,18 @@ function ActiveRow({ item }: { item: MeetingSummary }) {
 
       <span className="ws-row-trail">
         {hasInvitees ? (
-          <RoleProgress progress={item.roleProgress} />
+          <>
+            {item.roleProgress.decision.total > 0 && (
+              <ReadinessRing
+                size="compact"
+                kdmReady={item.roleProgress.decision.ready}
+                kdmTotal={item.roleProgress.decision.total}
+                requiredReady={item.roleProgress.required.ready}
+                requiredTotal={item.roleProgress.required.total}
+              />
+            )}
+            <RoleProgress progress={item.roleProgress} />
+          </>
         ) : (
           <span className="ws-meta-text">
             {formatDateRangeLabel(new Date(item.windowStartUtc), new Date(item.windowEndUtc))}

@@ -11,18 +11,28 @@ const TOUR_STEPS = [
   { selector: "[data-tour='calendar']", title: "Manage connected accounts", body: "Add calendars or update your booking setup whenever you need." },
 ];
 
-export function HelpCenter({ hasCalendar = false }: { hasCalendar?: boolean }) {
+interface TourPosition { left: number; top: number }
+
+export function HelpCenter({ hasCalendar = false, hasMeeting = false }: { hasCalendar?: boolean; hasMeeting?: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [tips, setTips] = useState(true);
   const [tourStep, setTourStep] = useState<number | null>(null);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const [tourPosition, setTourPosition] = useState<TourPosition | null>(null);
+  const [sharedInvite, setSharedInvite] = useState(false);
+  const [checklistDismissed, setChecklistDismissed] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("wenmeet:help-tips");
     const next = stored !== "off";
     setTips(next);
     document.documentElement.classList.toggle("help-tips-on", next);
+    const syncProgress = () => setSharedInvite(localStorage.getItem("wenmeet:shared-invite") === "complete");
+    syncProgress();
+    setChecklistDismissed(localStorage.getItem("wenmeet:checklist") === "dismissed");
+    window.addEventListener("wenmeet:progress", syncProgress);
+    return () => window.removeEventListener("wenmeet:progress", syncProgress);
   }, []);
 
   useEffect(() => {
@@ -39,7 +49,18 @@ export function HelpCenter({ hasCalendar = false }: { hasCalendar?: boolean }) {
     const target = document.querySelector(currentStep.selector);
     if (!target) { setTourStep(null); return; }
     target.scrollIntoView({ behavior: "smooth", block: "center" });
-    const update = () => setTargetRect(target.getBoundingClientRect());
+    const update = () => {
+      const rect = target.getBoundingClientRect();
+      const popoverWidth = Math.min(360, window.innerWidth - 32);
+      const popoverHeight = 220;
+      const gap = 18;
+      const left = rect.right + gap + popoverWidth <= window.innerWidth
+        ? rect.right + gap
+        : Math.max(16, rect.left - popoverWidth - gap);
+      const top = Math.min(Math.max(16, rect.top), window.innerHeight - popoverHeight - 16);
+      setTargetRect(rect);
+      setTourPosition({ left, top });
+    };
     const timer = window.setTimeout(update, 280);
     update();
     window.addEventListener("resize", update);
@@ -66,12 +87,24 @@ export function HelpCenter({ hasCalendar = false }: { hasCalendar?: boolean }) {
     else setTourStep(0);
   }
 
+  function finishTour() {
+    localStorage.setItem("wenmeet:dashboard-tour", "complete");
+    setTourStep(null);
+  }
+
+  function dismissChecklist() {
+    localStorage.setItem("wenmeet:checklist", "dismissed");
+    setChecklistDismissed(true);
+  }
+
   const checklist = [
     { done: hasCalendar, label: "Connect your primary calendar" },
-    { done: false, label: "Create your first WenMeet" },
-    { done: false, label: "Share an invite link" },
+    { done: hasMeeting, label: "Create your first WenMeet" },
+    { done: sharedInvite, label: "Share an invite link" },
   ];
   const completedCount = checklist.filter((item) => item.done).length;
+  const checklistComplete = completedCount === checklist.length;
+  const showChecklist = !checklistComplete && !checklistDismissed;
 
   return (
     <>
@@ -84,7 +117,7 @@ export function HelpCenter({ hasCalendar = false }: { hasCalendar?: boolean }) {
         <header className="help-drawer-head"><div><span className="help-eyebrow">WenMeet guide</span><h2>Help & resources</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="Close help">×</button></header>
         <div className="help-drawer-body">
           <label className="help-search"><span aria-hidden>⌕</span><input placeholder="Search help topics…" /></label>
-          <section className="help-block"><div className="help-block-title"><span>Quick start</span><span>{completedCount} of 3</span></div><div className="help-progress"><span style={{ width: `${(completedCount / 3) * 100}%` }} /></div>{checklist.map((item) => <div className="help-check" key={item.label}><span className={item.done ? "is-done" : ""}>{item.done ? "✓" : ""}</span>{item.label}</div>)}</section>
+          {showChecklist && <section className="help-block"><div className="help-block-title"><span>Quick start</span><span>{completedCount} of 3</span></div><div className="help-progress"><span style={{ width: `${(completedCount / 3) * 100}%` }} /></div>{checklist.map((item) => <div className="help-check" key={item.label}><span className={item.done ? "is-done" : ""}>{item.done ? "✓" : ""}</span>{item.label}</div>)}<button type="button" className="help-dismiss-checklist" onClick={dismissChecklist}>Hide this checklist</button></section>}
           <section className="help-block"><div className="help-block-title"><span>Interactive tours</span></div><button type="button" className="help-link" onClick={startTour}>Replay dashboard walkthrough <span>→</span></button></section>
           <section className="help-context"><span>Tip for this page</span><p>{contextTip}</p></section>
           <label className="help-tip-toggle"><span><strong>Inline help tips</strong><small>Show gentle guidance in context</small></span><input type="checkbox" checked={tips} onChange={toggleTips} /><span className="onboarding-switch" aria-hidden /></label>
@@ -92,13 +125,13 @@ export function HelpCenter({ hasCalendar = false }: { hasCalendar?: boolean }) {
         <footer className="help-drawer-foot"><Link href="/app">Read quick guide</Link></footer>
       </aside>
 
-      {tourStep !== null && targetRect && (
+      {tourStep !== null && targetRect && tourPosition && (
         <div className="tour-layer" role="dialog" aria-modal="true" aria-label="Dashboard walkthrough">
           <div className="tour-highlight" style={{ left: targetRect.left - 8, top: targetRect.top - 8, width: targetRect.width + 16, height: targetRect.height + 16 }} />
-          <div className="tour-popover">
+          <div className="tour-popover" style={{ left: tourPosition.left, top: tourPosition.top }}>
             <span className="tour-count">{tourStep + 1} / {TOUR_STEPS.length}</span>
             <h3>{TOUR_STEPS[tourStep]?.title}</h3><p>{TOUR_STEPS[tourStep]?.body}</p>
-            <div><button type="button" className="onboarding-text-button" onClick={() => setTourStep(null)}>Exit</button><button type="button" className="ws-btn ws-btn-primary ws-btn-sm" onClick={() => tourStep === TOUR_STEPS.length - 1 ? setTourStep(null) : setTourStep(tourStep + 1)}>{tourStep === TOUR_STEPS.length - 1 ? "Finish tour" : "Next"}</button></div>
+            <div><button type="button" className="onboarding-text-button" onClick={() => setTourStep(null)}>Exit</button><button type="button" className="ws-btn ws-btn-primary ws-btn-sm" onClick={() => tourStep === TOUR_STEPS.length - 1 ? finishTour() : setTourStep(tourStep + 1)}>{tourStep === TOUR_STEPS.length - 1 ? "Finish tour" : "Next"}</button></div>
           </div>
         </div>
       )}

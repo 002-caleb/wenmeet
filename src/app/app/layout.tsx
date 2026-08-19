@@ -18,12 +18,13 @@ import { getStore } from "@/lib/store";
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const participant = await getOrCreateCurrentParticipant();
   const store = getStore();
-  const [google, microsoft] = participant
+  const [google, microsoft, meetings] = participant
     ? await Promise.all([
         store.getCalendarConnection(participant.id, "google"),
         store.getCalendarConnection(participant.id, "microsoft"),
+        store.getMeetingsByOrganizer(participant.id),
       ])
-    : [null, null];
+    : [null, null, []];
 
   return (
     <div style={{ minHeight: "100dvh" }}>
@@ -44,7 +45,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </nav>
       <main id="main" style={{ maxWidth: 1040, margin: "0 auto", padding: "2rem 1.5rem" }}>{children}</main>
-      <HelpCenter hasCalendar={Boolean(google || microsoft)} />
+      <HelpCenter hasCalendar={Boolean(google || microsoft)} hasMeeting={meetings.length > 0} />
     </div>
   );
 }
