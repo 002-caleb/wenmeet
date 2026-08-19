@@ -6,10 +6,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { MeetingResolver } from "@/components/landing/MeetingResolver";
+import { SampleShareLink } from "@/components/landing/SampleShareLink";
 import { ScenarioExplorer } from "@/components/landing/ScenarioExplorer";
 import { RESOLVER_SCENARIOS, ROLE_LABEL, ROLE_SYMBOL, type RoleKind } from "@/lib/landing/resolverScenarios";
 
-const DEMO_LINK = "wenmeet.conscience.fund/m/…";
 const HERO_SCENARIO = RESOLVER_SCENARIOS[0]!;
 
 const WORKFLOW_STEPS = [
@@ -168,15 +168,8 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-        {/* Illustrates the shape of a real share link. It is not a copyable
-            URL, because a live meeting's token only exists once an organizer
-            creates one — offering "Copy link" here would hand over a URL
-            that goes nowhere. */}
         <div data-reveal style={{ display: "flex", justifyContent: "center", marginTop: "1.5rem" }}>
-          <div className="link-copy link-copy-sample">
-            <code>{DEMO_LINK}</code>
-            <span className="link-copy-note">Every WenMeet gets its own link</span>
-          </div>
+          <SampleShareLink />
         </div>
       </section>
 

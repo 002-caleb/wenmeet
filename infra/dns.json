@@ -1,0 +1,58 @@
+{
+  "$comment": [
+    "Declarative DNS for WenMeet. Apply with `npm run infra:dns:plan` (dry run)",
+    "then `npm run infra:dns:apply`. See infra/README.md.",
+    "",
+    "This file covers records the application depends on and that would",
+    "otherwise only exist as undocumented dashboard clicks. Records created",
+    "automatically by Netlify when a domain is attached to a site (type",
+    "NETLIFY, e.g. wenmeet.conscience.fund) are deliberately NOT listed:",
+    "they are owned by the platform, and managing them here would fight it.",
+    "",
+    "The tool never deletes records it does not declare. Anything else in the",
+    "zone is reported as unmanaged and left alone."
+  ],
+  "zone": "conscience.fund",
+  "records": [
+    {
+      "type": "CNAME",
+      "hostname": "clerk.conscience.fund",
+      "value": "frontend-api.clerk.services",
+      "ttl": 3600,
+      "owner": "clerk",
+      "why": "Clerk production Frontend API. Sign-in breaks entirely without it, because the publishable key resolves auth against this host."
+    },
+    {
+      "type": "CNAME",
+      "hostname": "accounts.conscience.fund",
+      "value": "accounts.clerk.services",
+      "ttl": 3600,
+      "owner": "clerk",
+      "why": "Clerk hosted account pages."
+    },
+    {
+      "type": "CNAME",
+      "hostname": "clkmail.conscience.fund",
+      "value": "mail.clcj8592r9em.clerk.services",
+      "ttl": 3600,
+      "owner": "clerk",
+      "why": "Return path for Clerk transactional mail (verification, magic links)."
+    },
+    {
+      "type": "CNAME",
+      "hostname": "clk._domainkey.conscience.fund",
+      "value": "dkim1.clcj8592r9em.clerk.services",
+      "ttl": 3600,
+      "owner": "clerk",
+      "why": "DKIM key 1 — without it Clerk mail is likely to be spam-filtered."
+    },
+    {
+      "type": "CNAME",
+      "hostname": "clk2._domainkey.conscience.fund",
+      "value": "dkim2.clcj8592r9em.clerk.services",
+      "ttl": 3600,
+      "owner": "clerk",
+      "why": "DKIM key 2 — Clerk rotates between the two."
+    }
+  ]
+}

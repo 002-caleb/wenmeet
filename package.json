@@ -2,7 +2,7 @@
   "name": "wenmeet",
   "version": "0.2.0",
   "private": true,
-  "description": "WenMeet — intelligent meeting coordination (formerly Nebula Habitats). Conscious Capital Brands.",
+  "description": "WenMeet \u2014 intelligent meeting coordination (formerly Nebula Habitats). Conscious Capital Brands.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +10,9 @@
     "lint": "next lint",
     "lint:copy": "node scripts/lint-product-copy.mjs",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "infra:dns:plan": "node scripts/infra-dns.mjs",
+    "infra:dns:apply": "node scripts/infra-dns.mjs --apply"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.39.6",
